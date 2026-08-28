@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಸುದ್ದಿ ಪ್ರಕಾಶನ ವ್ಯವಸ್ಥೆ | Publish News</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Kannada:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+    <script>
+        if (localStorage.getItem('user_role') !== 'admin') {
+            document.write(`
+                <div style="text-align: center; margin-top: 100px; font-family: sans-serif; color: #1e293b;">
+                    <h2 style="font-size: 32px; color: #ef4444;">⚠️ Access Denied</h2>
+                    <p style="font-size: 16px; margin: 12px 0;">You must be logged in as an Administrator to access the Newsroom.</p>
+                    <p style="font-size: 14px; color: #64748b;">Redirecting you back to the home page in 3 seconds...</p>
+                </div>
+            `);
+            setTimeout(() => { window.location.href = 'index.html'; }, 3000);
+            window.stop(); // Stops loading the rest of the page
+        }
+    </script>
+
+    <!-- TOP HEADER -->
+    <header class="main-header dashboard-header">
+        <div class="logo-container" onclick="window.location.href='/'">
+            <img src="images/logo.png" alt="ಸಂಪಾತಿ ನ್ಯೂಸ್" class="logo-img">
+            <div class="logo-text" style="margin-left: 12px; color: #FFFFFF;">ಸುದ್ದಿ ಕೊಠಡಿ (Newsroom)</div>
+        </div>
+        <div class="top-actions">
+            <a href="index.html" class="back-btn" style="margin-right: 16px;">📰 View Portal</a>
+            <a href="dashboard.html" class="back-btn">📊 Ads Dashboard</a>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="container" style="max-width: 800px;">
+        <h2 class="section-title">ಹೊಸ ಸುದ್ದಿ ಪ್ರಕಟಣೆ (Publish New Article)</h2>
+        <div class="underline"></div>
+
+        <form id="news-publish-form" class="booking-form" onsubmit="publishNews(event)">
+            <div class="form-group">
+                <label for="news-title">Headline / Title (ಸುದ್ದಿ ಶೀರ್ಷಿಕೆ):</label>
+                <input type="text" id="news-title" required placeholder="e.g., ರಾಜಧಾನಿಯಲ್ಲಿ ಭಾರಿ ಯಶಸ್ಸು ಕಂಡ ಕನ್ನಡ ತಂತ್ರಜ್ಞಾನ ಮೇಳ">
+            </div>
+
+            <div class="form-group">
+                <label for="news-sub">Subtitle (ಉಪಶೀರ್ಷಿಕೆ):</label>
+                <input type="text" id="news-sub" placeholder="e.g., ನೂರಾರು ಸ್ಟಾರ್ಟ್‌ಅಪ್‌ಗಳು ಭಾಗಿ, ಯುವ ಸಂಶೋಧಕರಿಗೆ ಪ್ರಶಸ್ತಿ ವಿತರಣೆ">
+            </div>
+
+            <div class="form-group">
+                <label for="news-exc">Excerpt / Brief Summary (ಸುದ್ದಿ ಮುಖ್ಯಾಂಶ):</label>
+                <input type="text" id="news-exc" required placeholder="e.g., ಕೃಷಿ ಮತ್ತು ಶಿಕ್ಷಣ ಕ್ಷೇತ್ರದಲ್ಲಿ ತಂತ್ರಜ್ಞಾನ ಬಳಕೆಯ ಬಗ್ಗೆ ಪ್ರಮುಖ ಪ್ರದರ್ಶನ...">
+            </div>
+
+            <div class="form-group">
+                <label for="news-body">News Content Body (ಲೇಖನ ಪೂರ್ಣ ಮಾಹಿತಿ - Paragraphs split by Enter):</label>
+                <textarea id="news-body" required rows="8" placeholder="ಇಲ್ಲಿ ಪೂರ್ಣ ಸುದ್ದಿಯ ವಿವರಗಳನ್ನು ಬರೆಯಿರಿ..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); background-color: var(--bg); color: var(--text); font-family: inherit; font-size: 14px; outline: none;"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="news-cat">Category (ಸುದ್ದಿ ವಿಭಾಗ):</label>
+                <select id="news-cat" required>
+                    <!-- Loaded Dynamically -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="news-dist">Target District (ಜಿಲ್ಲೆ):</label>
+                <select id="news-dist" required>
+                    <!-- Loaded Dynamically -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Featured Cover Image (ಮುಖಪುಟ ಚಿತ್ರ):</label>
+                <div style="display: flex; gap: 12px; margin-bottom: 8px;">
+                    <button type="button" id="toggle-img-method" onclick="toggleImageMethod()" class="submit-btn" style="width: auto; padding: 6px 12px; font-size: 11px; background-color: var(--text-muted); cursor: pointer;">📁 Switch to File Upload</button>
+                </div>
+                
+                <!-- URL Input block -->
+                <div id="img-url-block">
+                    <input type="url" id="news-img" placeholder="Paste image web URL here">
+                </div>
+
+                <!-- File Input block -->
+                <div id="img-file-block" style="display: none;">
+                    <input type="file" id="news-image-file" accept="image/*" onchange="previewUploadedImage(event)">
+                </div>
+
+                <!-- Image preview -->
+                <div id="image-preview" style="margin-top: 10px; display: none;">
+                    <img id="preview-img" style="max-height: 120px; border-radius: 6px; border: 1px solid var(--border); display: block;">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="news-dur">Estimated Reading Time (Minutes):</label>
+                <input type="number" id="news-dur" value="3" min="1" max="30" required>
+            </div>
+
+            <button type="submit" class="submit-btn" style="margin-top: 16px;">🚀 Publish Now (ಸುದ್ದಿ ಪ್ರಕಟಿಸಿ)</button>
+        </form>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="main-footer">
+        <div class="footer-bottom">
+            &copy; 2026 ಸಂಪಾತಿ ನ್ಯೂಸ್. All rights reserved. Developed by Framesy.
+        </div>
+    </footer>
+
+    <!-- SCRIPT -->
+    <script>
+        const API_URL = '/wp-json/sampathi/v1';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchCategories();
+            fetchDistricts();
+        });
+
+        function fetchCategories() {
+            fetch(`${API_URL}/categories`)
+                .then(res => res.json())
+                .then(data => {
+                    const el = document.getElementById('news-cat');
+                    el.innerHTML = '';
+                    data.forEach(c => {
+                        el.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+                    });
+                });
+        }
+
+        function fetchDistricts() {
+            fetch(`${API_URL}/districts`)
+                .then(res => res.json())
+                .then(data => {
+                    const el = document.getElementById('news-dist');
+                    el.innerHTML = '';
+                    data.forEach(d => {
+                        el.innerHTML += `<option value="${d.id}">${d.name}</option>`;
+                    });
+                });
+        }
+
+        let selectedImageBase64 = '';
+        let activeImageMethod = 'url'; // 'url' or 'file'
+
+        function toggleImageMethod() {
+            const btn = document.getElementById('toggle-img-method');
+            const urlBlock = document.getElementById('img-url-block');
+            const fileBlock = document.getElementById('img-file-block');
+            const previewBlock = document.getElementById('image-preview');
+
+            if (activeImageMethod === 'url') {
+                activeImageMethod = 'file';
+                btn.textContent = '🔗 Switch to URL Link';
+                urlBlock.style.display = 'none';
+                fileBlock.style.display = 'block';
+                if (selectedImageBase64) {
+                    previewBlock.style.display = 'block';
+                }
+            } else {
+                activeImageMethod = 'url';
+                btn.textContent = '📁 Switch to File Upload';
+                urlBlock.style.display = 'block';
+                fileBlock.style.display = 'none';
+                previewBlock.style.display = 'none';
+            }
+        }
+
+        function previewUploadedImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                selectedImageBase64 = e.target.result;
+                const previewImg = document.getElementById('preview-img');
+                const previewBlock = document.getElementById('image-preview');
+                
+                previewImg.src = selectedImageBase64;
+                previewBlock.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function publishNews(e) {
+            e.preventDefault();
+            const title = document.getElementById('news-title').value;
+            const subtitle = document.getElementById('news-sub').value;
+            const excerpt = document.getElementById('news-exc').value;
+            
+            // Format content body text into paragraphs html structure
+            const rawBody = document.getElementById('news-body').value;
+            const content = rawBody.split('\n').filter(p => p.trim() !== '').map(p => `<p>${p}</p>`).join('');
+
+            const category_id = parseInt(document.getElementById('news-cat').value);
+            const district_id = parseInt(document.getElementById('news-dist').value);
+            const reading_time = parseInt(document.getElementById('news-dur').value);
+
+            // Determine cover image based on selection method
+            let featured_image_url = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800'; // Default
+            if (activeImageMethod === 'file' && selectedImageBase64) {
+                featured_image_url = selectedImageBase64;
+            } else {
+                const urlVal = document.getElementById('news-img').value.trim();
+                if (urlVal.length > 0) {
+                    featured_image_url = urlVal;
+                }
+            }
+
+            fetch(`${API_URL}/news/add`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title,
+                    subtitle,
+                    excerpt,
+                    content,
+                    category_id,
+                    district_id,
+                    featured_image_url,
+                    reading_time
+                })
+            })
+            .then(res => res.json())
+            .then(article => {
+                alert('Congratulations! Your news article has been published successfully. Redirecting you to the homepage to see it live.');
+                window.location.href = '/';
+            });
+        }
+    </script>
+</body>
+</html>
