@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಸಂಪಾತಿ ನ್ಯೂಸ್ | Sampathi News - Kannada Digital News</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Kannada:wght@300;400;500;600;700&family=Noto+Serif+Kannada:wght@400;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Brand Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- TOP WEATHER / THEME TOGGLE BAR -->
+    <div class="top-bar">
+        <div class="weather">
+            <span class="sun-icon">☀️</span> Bengaluru: 24°C, Sunny
+            <span style="margin-left: 12px; margin-right: 12px; color: var(--border);">|</span>
+            <a href="https://www.instagram.com/sampaathi_news?igsh=Ynpvanc1ODZwNXB5" target="_blank" style="margin-right: 12px; color: var(--text-muted); text-decoration: none;"><i class="fab fa-instagram" style="color: #E1306C; margin-right: 4px;"></i> Instagram</a>
+            <a href="https://www.facebook.com/sampaathinews" target="_blank" style="color: var(--text-muted); text-decoration: none;"><i class="fab fa-facebook" style="color: #1877F2; margin-right: 4px;"></i> Facebook</a>
+        </div>
+        <div class="top-actions">
+            <button id="theme-btn" class="theme-toggle">☀️ Light Mode</button>
+            <a href="publish.html" id="link-publish" class="dashboard-link" style="display: none;">✍️ Publish News</a>
+            <a href="dashboard.html" id="link-dashboard" class="dashboard-link" style="display: none;">📊 Ad Dashboard</a>
+            <button id="login-btn" onclick="toggleLogin()" class="theme-toggle" style="margin-left: 16px; font-weight: bold; color: var(--error); cursor: pointer;">🔒 Login as Admin</button>
+        </div>
+    </div>
+
+    <!-- MAIN APBAR / HEADER -->
+    <header class="main-header">
+        <div class="header-branding-row">
+            <div class="logo-container" onclick="window.location.reload()">
+                <img src="images/logo.png" alt="ಸಂಪಾತಿ ನ್ಯೂಸ್" class="logo-img">
+            </div>
+            <button id="menu-toggle-btn" onclick="toggleMobileMenu()" class="menu-toggle-icon">☰</button>
+        </div>
+        <nav class="nav-menu">
+            <a href="#" class="nav-item active">ಪ್ರಮುಖ ಸುದ್ದಿ</a>
+            <a href="#" class="nav-item" onclick="loadCategory(2, 'ಕರ್ನಾಟಕ')">ಕರ್ನಾಟಕ</a>
+            <a href="#" class="nav-item" onclick="loadCategory(3, 'ಬೆಂಗಳೂರು')">ಬೆಂಗಳೂರು</a>
+            <a href="#" class="nav-item" onclick="loadCategory(4, 'ರಾಜಕೀಯ')">ರಾಜಕೀಯ</a>
+            <a href="#" class="nav-item" onclick="loadCategory(5, 'ತಂತ್ರಜ್ಞಾನ')">ತಂತ್ರಜ್ಞಾನ</a>
+            <a href="#" class="nav-item" onclick="loadCategory(6, 'ಕೃಷಿ')">ಕೃಷಿ</a>
+        </nav>
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="ಹುಡುಕಿ..." onkeypress="handleSearch(event)">
+        </div>
+    </header>
+
+    <!-- BREAKING NEWS TICKER -->
+    <div class="ticker-bar">
+        <div class="ticker-title">ಪ್ರಮುಖ ಸುದ್ದಿ</div>
+        <div class="ticker-wrap">
+            <div class="ticker-content" id="ticker-text">
+                ಸುದ್ದಿ ಲೋಡ್ ಆಗುತ್ತಿದೆ...
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN WRAPPER -->
+    <main class="container">
+        <!-- Header Banner Advertisement -->
+        <div class="ad-slot" id="header-ad" data-position="header_banner">
+            <!-- Dynamically Loaded -->
+        </div>
+
+        <div class="content-grid">
+            <!-- Left Column: News feeds (70%) -->
+            <section class="main-column">
+                <h2 class="section-title" id="page-category-title">ಮುಖ್ಯಾಂಶಗಳು (Top Stories)</h2>
+                <div class="underline"></div>
+
+                <!-- Hero Section -->
+                <div id="hero-showcase" class="hero-card">
+                    <!-- Dynamically Loaded -->
+                </div>
+
+                <!-- Articles Grid -->
+                <div id="news-grid" class="news-grid">
+                    <!-- Dynamically Loaded -->
+                </div>
+            </section>
+
+            <!-- Right Column: Sidebar Widgets & Ads (30%) -->
+            <aside class="sidebar-column">
+                <h3 class="section-title">ಜಿಲ್ಲಾವಾರು ಸುದ್ದಿ (District News)</h3>
+                <div class="underline"></div>
+                <div class="district-chips" id="district-list">
+                    <!-- Loaded dynamically -->
+                </div>
+
+                <div class="spacer-32"></div>
+
+                <h3 class="section-title">ಜಾಹೀರಾತು (Sponsored)</h3>
+                <div class="underline"></div>
+                <div class="ad-slot-sidebar" id="sidebar-ad" data-position="sidebar_banner">
+                    <!-- Dynamically Loaded -->
+                </div>
+
+                <div class="spacer-32"></div>
+
+                <h3 class="section-title">ಜನಪ್ರಿಯ ವರದಿಗಳು (Trending)</h3>
+                <div class="underline"></div>
+                <div class="trending-list" id="trending-list">
+                    <!-- Loaded dynamically -->
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- ARTICLE DETAILS MODAL PREVIEW -->
+    <div id="article-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div id="modal-article-body">
+                <!-- Dynamically loaded -->
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="main-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <img src="images/logo.png" alt="ಸಂಪಾತಿ ನ್ಯೂಸ್" class="logo-img-footer" style="height: 48px; object-fit: contain; margin-bottom: 16px; border-radius: 4px; display: block;">
+                <p>ಕರ್ನಾಟಕದ ಅತ್ಯಂತ ವಿಶ್ವಾಸಾರ್ಹ ಡಿಜಿಟಲ್ ಸುದ್ದಿ ಮಾಧ್ಯಮ. ನಿಖರ ಮಾಹಿತಿ ಮತ್ತು ಕ್ಷಿಪ್ರ ಸುದ್ದಿಗಳಿಗಾಗಿ ನಮ್ಮನ್ನು ಫಾಲೋ ಮಾಡಿ.</p>
+                <div class="social-links" style="margin-top: 16px; display: flex; gap: 12px;">
+                    <a href="https://www.instagram.com/sampaathi_news?igsh=Ynpvanc1ODZwNXB5" target="_blank" class="social-btn instagram">
+                        <i class="fab fa-instagram"></i> Instagram
+                    </a>
+                    <a href="https://www.facebook.com/sampaathinews" target="_blank" class="social-btn facebook">
+                        <i class="fab fa-facebook"></i> Facebook
+                    </a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>ವರ್ಗಗಳು</h4>
+                <a href="#">ಕರ್ನಾಟಕ</a>
+                <a href="#">ಬೆಂಗಳೂರು</a>
+                <a href="#">ರಾಜಕೀಯ</a>
+                <a href="#">ಕ್ರೀಡೆ</a>
+            </div>
+            <div class="footer-links">
+                <h4>ಸಂಪರ್ಕ</h4>
+                <a href="#">ನಮ್ಮ ಬಗ್ಗೆ</a>
+                <a href="dashboard.html">ಜಾಹೀರಾತು ಮಾಹಿತಿ</a>
+                <a href="#">ಗೌಪ್ಯತೆ ನೀತಿ</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 ಸಂಪಾತಿ ನ್ಯೂಸ್. All rights reserved. Developed by Framesy.
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE PROTO-CLIENT JAVASCRIPT -->
+    <script>
+        const API_URL = '/wp-json/sampathi/v1';
+        let currentTheme = 'light';
+
+        // Load content on boot
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchCategories();
+            fetchDistricts();
+            fetchNews();
+            fetchAds();
+            initTheme();
+            checkRole();
+        });
+
+        // Authentication & Role Management
+        function checkRole() {
+            const role = localStorage.getItem('user_role');
+            const linkPublish = document.getElementById('link-publish');
+            const linkDashboard = document.getElementById('link-dashboard');
+            const loginBtn = document.getElementById('login-btn');
+            
+            // Drawer equivalents
+            const drawerPublish = document.getElementById('drawer-link-publish');
+            const drawerDashboard = document.getElementById('drawer-link-dashboard');
+            const drawerLogin = document.getElementById('drawer-login-btn');
+
+            if (role === 'admin') {
+                linkPublish.style.display = 'inline';
+                linkDashboard.style.display = 'inline';
+                loginBtn.textContent = '🔓 Logout (Admin)';
+                loginBtn.style.color = 'var(--success)';
+
+                if (drawerPublish) drawerPublish.style.display = 'block';
+                if (drawerDashboard) drawerDashboard.style.display = 'block';
+                if (drawerLogin) drawerLogin.textContent = '🔓 Logout (Admin)';
+            } else {
+                linkPublish.style.display = 'none';
+                linkDashboard.style.display = 'none';
+                loginBtn.textContent = '🔒 Login as Admin';
+                loginBtn.style.color = 'var(--error)';
+
+                if (drawerPublish) drawerPublish.style.display = 'none';
+                if (drawerDashboard) drawerDashboard.style.display = 'none';
+                if (drawerLogin) drawerLogin.textContent = '🔒 Login as Admin';
+            }
+        }
+
+        function toggleLogin() {
+            const role = localStorage.getItem('user_role');
+            if (role === 'admin') {
+                localStorage.removeItem('user_role');
+                checkRole();
+            } else {
+                const user = prompt('Enter Username (default: admin):');
+                const pass = prompt('Enter Password (default: admin):');
+                if (user === 'admin' && pass === 'admin') {
+                    localStorage.setItem('user_role', 'admin');
+                    checkRole();
+                } else {
+                    alert('Invalid credentials! Default is admin/admin');
+                }
+            }
+        }
+
+        // Theme Configuration
+        function initTheme() {
+            const desktopBtn = document.getElementById('theme-btn');
+            const drawerBtn = document.getElementById('drawer-theme-btn');
+            
+            const syncTheme = () => {
+                if (currentTheme === 'light') {
+                    document.body.classList.add('dark-theme');
+                    currentTheme = 'dark';
+                    if (desktopBtn) desktopBtn.textContent = '🌙 Dark Mode';
+                    if (drawerBtn) drawerBtn.textContent = '🌙 Dark Mode';
+                } else {
+                    document.body.classList.remove('dark-theme');
+                    currentTheme = 'light';
+                    if (desktopBtn) desktopBtn.textContent = '☀️ Light Mode';
+                    if (drawerBtn) drawerBtn.textContent = '☀️ Light Mode';
+                }
+            };
+
+            if (desktopBtn) desktopBtn.addEventListener('click', syncTheme);
+            if (drawerBtn) drawerBtn.addEventListener('click', syncTheme);
+        }
+
+        // Fetch taxonomy filters dynamically
+        function fetchCategories() {
+            fetch(`${API_URL}/categories`)
+                .then(res => res.json())
+                .then(data => {
+                    const nav = document.querySelector('.nav-menu');
+                    nav.innerHTML = `<a href="#" class="nav-item active" onclick="loadCategory(null, 'ಮುಖ್ಯಾಂಶಗಳು')">ಪ್ರಮುಖ ಸುದ್ದಿ</a>`;
+                    
+                    const drawerCat = document.getElementById('drawer-categories');
+                    if (drawerCat) {
+                        drawerCat.innerHTML = `<a href="#" class="drawer-link active" onclick="loadCategory(null, 'ಮುಖ್ಯಾಂಶಗಳು'); toggleMobileMenu();">ಪ್ರಮುಖ ಸುದ್ದಿ</a>`;
+                    }
+
+                    data.forEach(cat => {
+                        if (cat.slug === 'top-stories') return;
+                        nav.innerHTML += `<a href="#" class="nav-item" onclick="loadCategory(${cat.id}, '${cat.name}')">${cat.name}</a>`;
+                        if (drawerCat) {
+                            drawerCat.innerHTML += `<a href="#" class="drawer-link" onclick="loadCategory(${cat.id}, '${cat.name}'); toggleMobileMenu();">${cat.name}</a>`;
+                        }
+                    });
+                });
+        }
+
+        function fetchDistricts() {
+            fetch(`${API_URL}/districts`)
+                .then(res => res.json())
+                .then(data => {
+                    const el = document.getElementById('district-list');
+                    el.innerHTML = '';
+                    
+                    const drawerDist = document.getElementById('drawer-districts');
+                    if (drawerDist) {
+                        drawerDist.innerHTML = '';
+                    }
+
+                    data.forEach(d => {
+                        el.innerHTML += `<span class="chip" onclick="loadDistrict(${d.id}, '${d.name}')">${d.name}</span>`;
+                        if (drawerDist) {
+                            drawerDist.innerHTML += `<a href="#" class="drawer-link" onclick="loadDistrict(${d.id}, '${d.name}'); toggleMobileMenu();">${d.name}</a>`;
+                        }
+                    });
+                });
+        }
+
+        // Fetch primary feeds
+        function fetchNews(catId = null, distId = null, query = null) {
+            let url = `${API_URL}/news`;
+            const params = [];
+            if (catId) params.push(`category=${catId}`);
+            if (distId) params.push(`district=${distId}`);
+            if (query) params.push(`search=${encodeURIComponent(query)}`);
+            if (params.length > 0) url += `?${params.join('&')}`;
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        document.getElementById('news-grid').innerHTML = '<p class="empty-msg">ಯಾವುದೇ ಸುದ್ದಿಗಳು ಕಂಡುಬಂದಿಲ್ಲ.</p>';
+                        document.getElementById('hero-showcase').style.display = 'none';
+                        return;
+                    }
+                    
+                    document.getElementById('hero-showcase').style.display = 'block';
+
+                    // Update breaking news ticker
+                    const tickerText = data.map(a => a.title).join('  |  ');
+                    document.getElementById('ticker-text').textContent = tickerText;
+
+                    // Load Hero card
+                    const hero = data[0];
+                    const heroEl = document.getElementById('hero-showcase');
+                    heroEl.innerHTML = `
+                        <div class="hero-img" style="background-image: url('${hero.featured_image_url}')"></div>
+                        <div class="hero-overlay" onclick="openArticle(${hero.id})">
+                            <span class="badge">ಮುಖ್ಯ ಸುದ್ದಿ</span>
+                            <h2>${hero.title}</h2>
+                            <p>${hero.excerpt}</p>
+                        </div>
+                    `;
+
+                    // Load grid items
+                    const gridEl = document.getElementById('news-grid');
+                    gridEl.innerHTML = '';
+                    const remaining = data.slice(1);
+
+                    remaining.forEach(art => {
+                        gridEl.innerHTML += `
+                            <div class="news-card" onclick="openArticle(${art.id})">
+                                <img src="${art.featured_image_url}" alt="Cover">
+                                <div class="card-body">
+                                    <h4>${art.title}</h4>
+                                    <p>${art.excerpt}</p>
+                                    <div class="meta-row">
+                                        <span>✍️ ${art.reporter.name}</span>
+                                        <span>⏱️ ${art.reading_time} min read</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    // Trending
+                    const trendingEl = document.getElementById('trending-list');
+                    trendingEl.innerHTML = '';
+                    data.slice(0, 3).forEach((art, index) => {
+                        trendingEl.innerHTML += `
+                            <div class="trending-item" onclick="openArticle(${art.id})">
+                                <span class="trend-num">0${index + 1}</span>
+                                <div class="trend-info">
+                                    <h5>${art.title}</h5>
+                                </div>
+                            </div>
+                        `;
+                    });
+                });
+        }
+
+        // Fetch targeted advertisements
+        function fetchAds(catId = null, distId = null) {
+            // 1. Header Ad banner
+            let headerUrl = `${API_URL}/ads?position=header_banner`;
+            if (catId) headerUrl += `&category=${catId}`;
+            if (distId) headerUrl += `&district=${distId}`;
+            
+            fetch(headerUrl)
+                .then(res => res.json())
+                .then(data => {
+                    const slot = document.getElementById('header-ad');
+                    if (data.length > 0) {
+                        const ad = data[0];
+                        slot.style.display = 'block';
+                        slot.innerHTML = `
+                            <img src="${ad.image_url}" alt="Ad" onclick="clickAd(${ad.id}, '${ad.landing_url}')">
+                            <span class="ad-label">AD</span>
+                        `;
+                        // Track Impression
+                        trackAd(ad.id, 'impression');
+                    } else {
+                        slot.style.display = 'none';
+                    }
+                });
+
+            // 2. Sidebar Ad box
+            let sidebarUrl = `${API_URL}/ads?position=sidebar_banner`;
+            if (catId) sidebarUrl += `&category=${catId}`;
+            if (distId) sidebarUrl += `&district=${distId}`;
+
+            fetch(sidebarUrl)
+                .then(res => res.json())
+                .then(data => {
+                    const slot = document.getElementById('sidebar-ad');
+                    if (data.length > 0) {
+                        const ad = data[0];
+                        slot.style.display = 'block';
+                        slot.innerHTML = `
+                            <img src="${ad.image_url}" alt="Ad" onclick="clickAd(${ad.id}, '${ad.landing_url}')">
+                            <span class="ad-label">AD</span>
+                        `;
+                        trackAd(ad.id, 'impression');
+                    } else {
+                        slot.style.display = 'none';
+                    }
+                });
+        }
+
+        // Filter trigger
+        function loadCategory(catId, name) {
+            document.getElementById('page-category-title').textContent = name === 'ಮುಖ್ಯಾಂಶಗಳು' ? 'ಮುಖ್ಯಾಂಶಗಳು (Top Stories)' : `${name} ವಿಭಾಗದ ಸುದ್ದಿಗಳು`;
+            
+            // Set active class in main nav
+            const mainItems = document.querySelectorAll('.nav-menu .nav-item');
+            mainItems.forEach(item => {
+                if (item.textContent.trim() === name || (name === 'ಮುಖ್ಯಾಂಶಗಳು' && item.textContent.trim() === 'ಪ್ರಮುಖ ಸುದ್ದಿ')) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            // Set active class in drawer
+            const drawerItems = document.querySelectorAll('#drawer-categories .drawer-link');
+            drawerItems.forEach(item => {
+                if (item.textContent.trim() === name || (name === 'ಮುಖ್ಯಾಂಶಗಳು' && item.textContent.trim() === 'ಪ್ರಮುಖ ಸುದ್ದಿ')) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+            
+            fetchNews(catId);
+            fetchAds(catId, null);
+        }
+
+        function loadDistrict(distId, name) {
+            document.getElementById('page-category-title').textContent = `${name} ಜಿಲ್ಲೆ ಸುದ್ದಿಗಳು`;
+            
+            // Highlight active state in drawer links if applicable
+            const drawerItems = document.querySelectorAll('#drawer-districts .drawer-link');
+            drawerItems.forEach(item => {
+                if (item.textContent.trim() === name) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            fetchNews(null, distId);
+            fetchAds(null, distId);
+        }
+
+        function handleSearch(event) {
+            if (event.key === 'Enter') {
+                const query = event.target.value.trim();
+                if (query.length > 0) {
+                    document.getElementById('page-category-title').textContent = `ಹುಡುಕಾಟದ ಫಲಿತಾಂಶ: "${query}"`;
+                    fetchNews(null, null, query);
+                }
+            }
+        }
+
+        // Track clicks
+        function clickAd(adId, url) {
+            trackAd(adId, 'click');
+            window.open(url, '_blank');
+        }
+
+        function trackAd(adId, action) {
+            fetch(`${API_URL}/ads/track`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ad_id: adId, action })
+            });
+        }
+
+        // View details modal
+        function openArticle(id) {
+            fetch(`${API_URL}/news/${id}`)
+                .then(res => res.json())
+                .then(art => {
+                    const modal = document.getElementById('article-modal');
+                    const body = document.getElementById('modal-article-body');
+
+                    // Compile details markup
+                    body.innerHTML = `
+                        <span class="modal-badge">${art.categories_data[0].name}</span>
+                        <h1 class="modal-title">${art.title}</h1>
+                        <p class="modal-sub">${art.subtitle}</p>
+                        
+                        <div class="modal-meta">
+                            <img src="${art.reporter.photo_url}" class="reporter-avatar">
+                            <div>
+                                <strong>${art.reporter.name}</strong><br>
+                                <span class="grey-text">${art.reporter.designation} | Published: ${new Date(art.date_published).toLocaleDateString()}</span>
+                            </div>
+                            <span class="views-tag">👁️ ${art.view_count} views</span>
+                        </div>
+
+                        <img src="${art.featured_image_url}" class="modal-hero-img">
+
+                        <!-- Share links -->
+                        <div class="share-links">
+                            <strong>ಸುದ್ದಿ ಶೇರ್ ಮಾಡಿ: </strong>
+                            <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(art.title + '\n' + art.share_url)}" target="_blank" class="share-btn whatsapp">WhatsApp</a>
+                            <a href="https://t.me/share/url?url=${encodeURIComponent(art.share_url)}&text=${encodeURIComponent(art.title)}" target="_blank" class="share-btn telegram">Telegram</a>
+                            <button class="share-btn copy" onclick="navigator.clipboard.writeText('${art.share_url}'); alert('ಲಿಂಕ್ ಕಾಪಿ ಮಾಡಲಾಗಿದೆ!')">Copy Link</button>
+                        </div>
+
+                        <div class="modal-content-html">
+                            ${art.content}
+                        </div>
+
+                        <!-- In-Article Advertisement slot dynamic -->
+                        <div class="ad-slot" id="article-inline-ad" style="display: none;">
+                            <!-- Loaded Dynamically -->
+                        </div>
+                    `;
+
+                    modal.style.display = 'block';
+
+                    // Fetch dynamic article inline ad
+                    fetch(`${API_URL}/ads?position=article_banner`)
+                        .then(res => res.json())
+                        .then(adsData => {
+                            const slot = document.getElementById('article-inline-ad');
+                            if (adsData.length > 0) {
+                                const ad = adsData[0];
+                                slot.style.display = 'block';
+                                slot.innerHTML = `
+                                    <img src="${ad.image_url}" alt="Ad" onclick="clickAd(${ad.id}, '${ad.landing_url}')">
+                                    <span class="ad-label">AD</span>
+                                `;
+                                trackAd(ad.id, 'impression');
+                            } else {
+                                slot.style.display = 'none';
+                            }
+                        });
+                });
+        }
+
+        function closeModal() {
+            document.getElementById('article-modal').style.display = 'none';
+        }
+
+        // Drawer controllers
+        function toggleMobileMenu() {
+            const drawer = document.getElementById('mobile-drawer');
+            drawer.classList.toggle('active');
+        }
+
+        function closeMobileMenu(event) {
+            const drawer = document.getElementById('mobile-drawer');
+            drawer.classList.remove('active');
+        }
+
+        // Close modal or drawer on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('article-modal');
+            const drawer = document.getElementById('mobile-drawer');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+            if (event.target == drawer) {
+                drawer.classList.remove('active');
+            }
+        }
+    </script>
+
+    <!-- MOBILE DRAWER MENU OVERLAY -->
+    <div id="mobile-drawer" class="mobile-drawer-overlay">
+        <div class="drawer-content">
+            <div class="drawer-header">
+                <h3>ಸಂಪಾತಿ ನ್ಯೂಸ್</h3>
+                <button onclick="toggleMobileMenu()" class="close-drawer-btn">&times;</button>
+            </div>
+            <div class="drawer-divider"></div>
+            
+            <!-- Navigation Links -->
+            <div class="drawer-section">
+                <h4>ಸುದ್ದಿ ವಿಭಾಗಗಳು (Categories)</h4>
+                <div id="drawer-categories" class="drawer-link-list">
+                    <!-- Categories Loaded Dynamically -->
+                </div>
+            </div>
+
+            <div class="drawer-divider"></div>
+
+            <div class="drawer-section">
+                <h4>ಜಿಲ್ಲಾ ವರದಿಗಳು (Districts)</h4>
+                <div id="drawer-districts" class="drawer-link-list">
+                    <!-- Districts Loaded Dynamically -->
+                </div>
+            </div>
+
+            <div class="drawer-divider"></div>
+
+            <!-- Weather & Theme Settings -->
+            <div class="drawer-section">
+                <h4>ಮಾಹಿತಿ ಮತ್ತು ವಿನ್ಯಾಸ (Info & Theme)</h4>
+                <div class="drawer-info-row">
+                    <span class="sun-icon">☀️</span> Bengaluru: 24°C, Sunny
+                </div>
+                <button id="drawer-theme-btn" class="drawer-theme-toggle" style="margin-top: 8px;">🌙 Dark Mode</button>
+            </div>
+
+            <div class="drawer-divider"></div>
+
+            <!-- Social Links -->
+            <div class="drawer-section">
+                <h4>ನಮ್ಮನ್ನು ಫಾಲೋ ಮಾಡಿ (Follow Us)</h4>
+                <div class="drawer-link-list">
+                    <a href="https://www.instagram.com/sampaathi_news?igsh=Ynpvanc1ODZwNXB5" target="_blank" class="drawer-link"><i class="fab fa-instagram" style="color: #E1306C; margin-right: 8px;"></i> Instagram Page</a>
+                    <a href="https://www.facebook.com/sampaathinews" target="_blank" class="drawer-link"><i class="fab fa-facebook" style="color: #1877F2; margin-right: 8px;"></i> Facebook Page</a>
+                </div>
+            </div>
+
+            <div class="drawer-divider"></div>
+
+            <!-- Admin Links -->
+            <div class="drawer-section">
+                <h4>ಆಡಳಿತ ಮಂಡಳಿ (Admin)</h4>
+                <a href="publish.html" id="drawer-link-publish" class="drawer-admin-link" style="display: none;">✍️ Publish News</a>
+                <a href="dashboard.html" id="drawer-link-dashboard" class="drawer-admin-link" style="display: none;">📊 Ad Dashboard</a>
+                <button id="drawer-login-btn" onclick="toggleLogin(); toggleMobileMenu();" class="drawer-login-btn" style="margin-top: 12px;">🔒 Login as Admin</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

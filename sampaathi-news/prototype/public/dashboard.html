@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಸಂಪಾತಿ ಜಾಹೀರಾತು ವ್ಯವಸ್ಥೆ | Ad Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Kannada:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+    <script>
+        if (localStorage.getItem('user_role') !== 'admin') {
+            document.write(`
+                <div style="text-align: center; margin-top: 100px; font-family: sans-serif; color: #1e293b;">
+                    <h2 style="font-size: 32px; color: #ef4444;">⚠️ Access Denied</h2>
+                    <p style="font-size: 16px; margin: 12px 0;">You must be logged in as an Administrator to access the Ad Dashboard.</p>
+                    <p style="font-size: 14px; color: #64748b;">Redirecting you back to the home page in 3 seconds...</p>
+                </div>
+            `);
+            setTimeout(() => { window.location.href = 'index.html'; }, 3000);
+            window.stop(); // Stops loading the rest of the page
+        }
+    </script>
+
+    <!-- TOP HEADER -->
+    <header class="main-header dashboard-header">
+        <div class="logo-container" onclick="window.location.href='/'">
+            <img src="images/logo.png" alt="ಸಂಪಾತಿ ನ್ಯೂಸ್" class="logo-img">
+            <div class="logo-text" style="margin-left: 12px; color: #FFFFFF;">ಆಡ್ಸ್ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್</div>
+        </div>
+        <div class="top-actions">
+            <a href="index.html" class="back-btn">📰 View News Portal</a>
+        </div>
+    </header>
+
+    <!-- WRAPPER -->
+    <main class="container">
+        <!-- Dashboard Metrics Grid -->
+        <h2 class="section-title">ಜಾಹೀರಾತು ಕಾರ್ಯಕ್ಷಮತೆ (Campaign Metrics)</h2>
+        <div class="underline"></div>
+
+        <div class="metrics-grid">
+            <div class="metric-card running">
+                <h3>ಚಾಲನೆಯಲ್ಲಿವೆ (Running)</h3>
+                <p id="m-running">0</p>
+            </div>
+            <div class="metric-card scheduled">
+                <h3>ನಿಗದಿತ (Scheduled)</h3>
+                <p id="m-scheduled">0</p>
+            </div>
+            <div class="metric-card expired">
+                <h3>ಅವಧಿ ಮುಗಿದಿವೆ (Expired)</h3>
+                <p id="m-expired">0</p>
+            </div>
+            <div class="metric-card performance">
+                <h3>ವೀಕ್ಷಣೆಗಳು / ಕ್ಲಿಕ್‌ಗಳು</h3>
+                <p id="m-traffic">0 / 0</p>
+            </div>
+            <div class="metric-card ctr">
+                <h3>ಕ್ಲಿಕ್ ದರ (CTR %)</h3>
+                <p id="m-ctr">0.00%</p>
+            </div>
+        </div>
+
+        <div class="spacer-32"></div>
+
+        <!-- Two Column Layout: Ad Booking Form & Ad Campaigns List -->
+        <div class="content-grid">
+            
+            <!-- Column 1: Book New Campaign (40%) -->
+            <section class="booking-column">
+                <h3 class="section-title">ಹೊಸ ಜಾಹೀರಾತು ಬುಕಿಂಗ್ (Book New Ad)</h3>
+                <div class="underline"></div>
+                
+                <form id="ad-booking-form" class="booking-form" onsubmit="bookAd(event)">
+                    <div class="form-group">
+                        <label for="biz-name">Sponsor Business Name (ಕಂಪನಿ ಹೆಸರು):</label>
+                        <input type="text" id="biz-name" required placeholder="e.g., Sampanna Jewellers">
+                    </div>
+                    <div class="form-group">
+                        <label for="ad-title">Advertisement Heading (ಜಾಹೀರಾತು ಶೀರ್ಷಿಕೆ):</label>
+                        <input type="text" id="ad-title" required placeholder="e.g., Gold Discount Sale 2026">
+                    </div>
+                    <div class="form-group">
+                        <label for="ad-pos">Position Display Slot:</label>
+                        <select id="ad-pos">
+                            <option value="header_banner">Header Banner</option>
+                            <option value="sidebar_banner">Sidebar Box</option>
+                            <option value="article_banner">Inside Article</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Banner Image (ಜาಹೀರಾತು ಚಿತ್ರ):</label>
+                        <div style="display: flex; gap: 12px; margin-bottom: 8px;">
+                            <button type="button" id="toggle-img-method" onclick="toggleImageMethod()" class="submit-btn" style="width: auto; padding: 6px 12px; font-size: 11px; background-color: var(--text-muted); cursor: pointer; color: white; border: none; border-radius: 4px;">📁 Switch to File Upload</button>
+                        </div>
+                        
+                        <!-- URL Input block -->
+                        <div id="img-url-block">
+                            <input type="url" id="ad-img" placeholder="Paste banner image web URL here">
+                        </div>
+
+                        <!-- File Input block -->
+                        <div id="img-file-block" style="display: none;">
+                            <input type="file" id="ad-image-file" accept="image/*" onchange="previewUploadedImage(event)">
+                        </div>
+
+                        <!-- Image preview -->
+                        <div id="image-preview" style="margin-top: 10px; display: none;">
+                            <img id="preview-img" style="max-height: 100px; border-radius: 6px; border: 1px solid var(--border); display: block;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="ad-landing">Landing / Target URL (ಲಿಂಕ್):</label>
+                        <input type="url" id="ad-landing" placeholder="e.g., https://google.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="ad-dur">Ad Duration (in Days - ಜಾಹೀರಾತು ಅವಧಿ ದಿನಗಳಲ್ಲಿ):</label>
+                        <input type="number" id="ad-dur" value="7" min="1" max="365" required>
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="test-fast-forward" checked style="width: auto;">
+                        <label for="test-fast-forward" style="margin-bottom: 0; font-size: 11px; cursor: pointer; color: var(--text-muted);">⚡ Fast-forward testing (treat days as seconds for instant expiration!)</label>
+                    </div>
+                    <button type="submit" class="submit-btn">🚀 Submit & Schedule Campaign</button>
+                </form>
+            </section>
+
+            <!-- Column 2: Active & Historical Campaigns (60%) -->
+            <section class="campaigns-column">
+                <h3 class="section-title">ಜಾಹೀರಾತು ಪಟ್ಟಿ (Campaigns List)</h3>
+                <div class="underline"></div>
+
+                <div class="table-container">
+                    <table class="ad-table">
+                        <thead>
+                            <tr>
+                                <th>Business Name</th>
+                                <th>Position</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ad-table-body">
+                            <!-- Loaded Dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="main-footer">
+        <div class="footer-bottom">
+            &copy; 2026 ಸಂಪಾತಿ ನ್ಯೂಸ್. All rights reserved. Developed by Framesy.
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE PROTO-DASHBOARD JAVASCRIPT -->
+    <script>
+        const API_URL = '/wp-json/sampathi/v1';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchReport();
+            // Poll report every 2 seconds for real-time scheduling / analytic updates
+            setInterval(fetchReport, 2000);
+        });
+
+        function fetchReport() {
+            fetch(`${API_URL}/analytics/report`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('m-running').textContent = data.running;
+                    document.getElementById('m-scheduled').textContent = data.scheduled;
+                    document.getElementById('m-expired').textContent = data.expired;
+                    document.getElementById('m-traffic').textContent = `${data.impressions} / ${data.clicks}`;
+                    document.getElementById('m-ctr').textContent = `${data.ctr}%`;
+
+                    // Render campaign lists table
+                    const tbody = document.getElementById('ad-table-body');
+                    tbody.innerHTML = '';
+                    
+                    data.advertisements.forEach(ad => {
+                        let statusBadge = '';
+                        let actionBtn = '';
+                        if (ad.status === 'active') {
+                            statusBadge = `<span class="badge active-badge">ACTIVE</span>`;
+                            actionBtn = `<button onclick="deactivateAd(${ad.id})" class="submit-btn" style="width: auto; padding: 4px 8px; font-size: 10px; margin-top: 4px; background-color: var(--error); display: block; border-radius: 4px; cursor: pointer; color: white; border: none; font-weight: 500;">⛔ Stop</button>`;
+                        } else if (ad.status === 'scheduled') {
+                            statusBadge = `<span class="badge scheduled-badge">SCHEDULED</span>`;
+                        } else {
+                            statusBadge = `<span class="badge expired-badge">EXPIRED</span>`;
+                            actionBtn = `<button onclick="reactivateAd(${ad.id})" class="submit-btn" style="width: auto; padding: 4px 8px; font-size: 10px; margin-top: 4px; background-color: var(--secondary); display: block; border-radius: 4px; cursor: pointer; color: white; border: none; font-weight: 500;">🔄 Renew</button>`;
+                        }
+
+                        tbody.innerHTML += `
+                            <tr>
+                                <td><strong>${ad.business_name}</strong><br><span class="grey-desc">${ad.title}</span></td>
+                                <td><code class="code-pos">${ad.position}</code></td>
+                                <td class="date-text">${new Date(ad.start_date).toLocaleTimeString()}</td>
+                                <td class="date-text">${new Date(ad.end_date).toLocaleTimeString()}</td>
+                                <td>
+                                    ${statusBadge}
+                                    ${actionBtn}
+                                </td>
+                            </tr>
+                        `;
+                    });
+                });
+        }
+
+        let selectedImageBase64 = '';
+        let activeImageMethod = 'url'; // 'url' or 'file'
+
+        function toggleImageMethod() {
+            const btn = document.getElementById('toggle-img-method');
+            const urlBlock = document.getElementById('img-url-block');
+            const fileBlock = document.getElementById('img-file-block');
+            const previewBlock = document.getElementById('image-preview');
+
+            if (activeImageMethod === 'url') {
+                activeImageMethod = 'file';
+                btn.textContent = '🔗 Switch to URL Link';
+                urlBlock.style.display = 'none';
+                fileBlock.style.display = 'block';
+                if (selectedImageBase64) {
+                    previewBlock.style.display = 'block';
+                }
+            } else {
+                activeImageMethod = 'url';
+                btn.textContent = '📁 Switch to File Upload';
+                urlBlock.style.display = 'block';
+                fileBlock.style.display = 'none';
+                previewBlock.style.display = 'none';
+            }
+        }
+
+        function previewUploadedImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                selectedImageBase64 = e.target.result;
+                const previewImg = document.getElementById('preview-img');
+                const previewBlock = document.getElementById('image-preview');
+                
+                previewImg.src = selectedImageBase64;
+                previewBlock.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function bookAd(e) {
+            e.preventDefault();
+            const business_name = document.getElementById('biz-name').value;
+            const title = document.getElementById('ad-title').value;
+            const position = document.getElementById('ad-pos').value;
+            const landing_url = document.getElementById('ad-landing').value.trim() || 'https://google.com';
+            const days = parseInt(document.getElementById('ad-dur').value);
+            const isFastForward = document.getElementById('test-fast-forward').checked;
+            const duration_seconds = isFastForward ? days : days * 24 * 60 * 60;
+
+            // Determine image URL based on selection method
+            let image_url = 'https://images.unsplash.com/photo-1542744094-3a31f103e35f?w=600'; // Default
+            if (activeImageMethod === 'file' && selectedImageBase64) {
+                image_url = selectedImageBase64;
+            } else {
+                const urlVal = document.getElementById('ad-img').value.trim();
+                if (urlVal.length > 0) {
+                    image_url = urlVal;
+                }
+            }
+
+            fetch(`${API_URL}/ads/add`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ business_name, title, position, image_url, duration_seconds, landing_url })
+            })
+            .then(res => res.json())
+            .then(newAd => {
+                const message = isFastForward 
+                    ? `Campaign successfully booked! Ad is scheduled and will remain active for ${days} seconds (Fast-forward mode).`
+                    : `Campaign successfully booked! Ad is scheduled and will remain active for ${days} days.`;
+                alert(message);
+                
+                // Reset form and state
+                document.getElementById('ad-booking-form').reset();
+                selectedImageBase64 = '';
+                document.getElementById('image-preview').style.display = 'none';
+                if (activeImageMethod === 'file') {
+                    toggleImageMethod(); // Reset back to URL view
+                }
+                
+                fetchReport();
+            });
+        }
+
+        function reactivateAd(adId) {
+            fetch(`${API_URL}/ads/reactivate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ad_id: adId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert('Ad campaign has been successfully renewed and reactivated for 7 days!');
+                fetchReport();
+            });
+        }
+
+        function deactivateAd(adId) {
+            if (confirm('Are you sure you want to stop/deactivate this ad campaign immediately?')) {
+                fetch(`${API_URL}/ads/deactivate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ad_id: adId })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    alert('Ad campaign has been successfully deactivated!');
+                    fetchReport();
+                });
+            }
+        }
+    </script>
+</body>
+</html>
