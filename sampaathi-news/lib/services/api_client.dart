@@ -30,6 +30,7 @@ class ApiClient {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
+          print('API REQUEST: ${options.baseUrl}${options.path}');
           // Uses a custom header (not "Authorization") so it isn't stripped
           // by local dev servers (e.g. Local by Flywheel's Nginx) before
           // reaching WordPress. See sampathi_authenticate_via_token() in
