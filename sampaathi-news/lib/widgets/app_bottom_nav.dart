@@ -19,11 +19,17 @@ class AppBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentIndex = _currentIndex;
+
     return BottomNavigationBar(
-      currentIndex: _currentIndex,
+      currentIndex: currentIndex,
       selectedItemColor: AppTheme.primaryColor,
       unselectedItemColor: Colors.grey,
       type: BottomNavigationBarType.fixed,
+      showSelectedLabels: true,
+      showUnselectedLabels: true,
+      selectedLabelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+      unselectedLabelStyle: const TextStyle(fontSize: 11),
       onTap: (index) {
         switch (index) {
           case 0:
@@ -37,11 +43,48 @@ class AppBottomNav extends StatelessWidget {
             break;
         }
       },
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'ಮುಖಪುಟ'),
-        BottomNavigationBarItem(icon: Icon(Icons.article_outlined), activeIcon: Icon(Icons.article), label: 'ಇತ್ತೀಚಿನ ಸುದ್ದಿ'),
-        BottomNavigationBarItem(icon: Icon(Icons.person_outline), activeIcon: Icon(Icons.person), label: 'ಪ್ರೊಫೈಲ್'),
+      items: [
+        BottomNavigationBarItem(
+          icon: _buildAnimatedIcon(Icons.home_outlined, false),
+          activeIcon: _buildAnimatedIcon(Icons.home, true),
+          label: 'ಮುಖಪುಟ',
+        ),
+        BottomNavigationBarItem(
+          icon: _buildAnimatedIcon(Icons.article_outlined, false),
+          activeIcon: _buildAnimatedIcon(Icons.article, true),
+          label: 'ಇತ್ತೀಚಿನ ಸುದ್ದಿ',
+        ),
+        BottomNavigationBarItem(
+          icon: _buildAnimatedIcon(Icons.person_outline, false),
+          activeIcon: _buildAnimatedIcon(Icons.person, true),
+          label: 'ಪ್ರೊಫೈಲ್',
+        ),
       ],
+    );
+  }
+
+  Widget _buildAnimatedIcon(IconData icon, bool isActive) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: isActive ? 0.8 : 1.0, end: isActive ? 1.15 : 1.0),
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutBack,
+      builder: (context, value, child) {
+        return Transform.scale(
+          scale: value,
+          child: Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: isActive ? AppTheme.primaryColor.withOpacity(0.12) : Colors.transparent,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: isActive ? AppTheme.primaryColor : Colors.grey,
+              size: 22,
+            ),
+          ),
+        );
+      },
     );
   }
 }
