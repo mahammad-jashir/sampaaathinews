@@ -1,7 +1,7 @@
 # 🚀 Sampathi News - Enterprise Kannada Digital News Portal
 
 Sampathi News is a modern, enterprise-scale digital newsroom designed to deliver a high-performance Kannada-first reading experience. The solution utilizes a **headless WordPress CMS** as the content, reporter, and advertisement dashboard, coupled with a responsive, premium **Flutter Web** frontend.
-
+ 
 ---
 
 ## 📂 Project Architecture
