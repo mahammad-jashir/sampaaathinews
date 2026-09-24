@@ -13,6 +13,22 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 // Serve static preview files from public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://sampaaathinews.vercel.app';
+
+function sanitizeArticle(a, req) {
+  if (!a) return a;
+  const clone = { ...a };
+  const origin = req && req.get && req.get('origin');
+  const base = (origin && !origin.includes('localhost') && !origin.includes('127.0.0.1'))
+    ? origin.replace(/\/+$/, '')
+    : FRONTEND_URL.replace(/\/+$/, '');
+
+  if (!clone.share_url || clone.share_url.includes('localhost') || clone.share_url.includes('127.0.0.1')) {
+    clone.share_url = `${base}/article/${clone.id}`;
+  }
+  return clone;
+}
+
 // --- IN-MEMORY DATABASE STATE (Simulating WordPress DB) ---
 let categories = [
   { id: 1, name: 'ಪ್ರಮುಖ ಸುದ್ದಿ', slug: 'top-stories' },
@@ -57,7 +73,7 @@ let articles = [
     categories_data: [categories[1], categories[6]],
     districts_data: [districts[0]],
     reporter: reporters[0],
-    share_url: 'http://localhost:3000/article.html?id=1'
+    share_url: `${FRONTEND_URL}/article/1`
   },
   {
     id: 2,
@@ -73,7 +89,7 @@ let articles = [
     categories_data: [categories[2], categories[6]],
     districts_data: [districts[3]],
     reporter: reporters[0],
-    share_url: 'http://localhost:3000/article.html?id=2'
+    share_url: `${FRONTEND_URL}/article/2`
   },
   {
     id: 3,
@@ -89,7 +105,7 @@ let articles = [
     categories_data: [categories[2], categories[6]],
     districts_data: [districts[3]],
     reporter: reporters[0],
-    share_url: 'http://localhost:3000/article.html?id=3'
+    share_url: `${FRONTEND_URL}/article/3`
   },
   {
     id: 4,
@@ -105,7 +121,7 @@ let articles = [
     categories_data: [categories[3], categories[6]],
     districts_data: [districts[4]],
     reporter: reporters[0],
-    share_url: 'http://localhost:3000/article.html?id=4'
+    share_url: `${FRONTEND_URL}/article/4`
   }
 ];
 
@@ -239,7 +255,7 @@ app.get('/wp-json/sampathi/v1/news', (req, res) => {
     const query = search.toLowerCase();
     filtered = filtered.filter(a => a.title.toLowerCase().includes(query) || a.excerpt.toLowerCase().includes(query));
   }
-  res.json(filtered);
+  res.json(filtered.map(a => sanitizeArticle(a, req)));
 });
 
 // Get Single Article Details
@@ -247,7 +263,7 @@ app.get('/wp-json/sampathi/v1/news/:id', (req, res) => {
   const article = articles.find(a => a.id == req.params.id);
   if (!article) return res.status(404).json({ error: 'Article not found' });
   article.view_count++;
-  res.json(article);
+  res.json(sanitizeArticle(article, req));
 });
 
 // Get Categories
@@ -386,8 +402,14 @@ app.post('/wp-json/sampathi/v1/news/add', (req, res) => {
   const catObj = categories.find(c => c.id == category_id) || categories[0];
   const distObj = districts.find(d => d.id == district_id) || districts[0];
 
+  const id = Date.now();
+  const origin = req.get('origin');
+  const base = (origin && !origin.includes('localhost') && !origin.includes('127.0.0.1'))
+    ? origin.replace(/\/+$/, '')
+    : FRONTEND_URL.replace(/\/+$/, '');
+
   const newArticle = {
-    id: Date.now(),
+    id: id,
     title: title || 'ಹೊಸ ಸುದ್ದಿ',
     subtitle: subtitle || '',
     excerpt: excerpt || '',
@@ -400,14 +422,28 @@ app.post('/wp-json/sampathi/v1/news/add', (req, res) => {
     categories_data: [catObj],
     districts_data: [distObj],
     reporter: reporters[0],
-    share_url: `http://localhost:3000/article.html?id=${Date.now()}`
+    share_url: `${base}/article/${id}`
   };
 
   articles.unshift(newArticle); // Prepend to articles list (loads as latest story)
   saveDb();
-  res.json(newArticle);
+  res.json(sanitizeArticle(newArticle, req));
 });
 
+
+// Serve single article route (loads index.html which auto-opens article modal)
+app.get('/article/:id', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Legacy / fallback route for article.html?id=...
+app.get('/article.html', (req, res) => {
+  const id = req.query.id;
+  if (id) {
+    return res.redirect(`/article/${id}`);
+  }
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Run server
 app.listen(PORT, () => {

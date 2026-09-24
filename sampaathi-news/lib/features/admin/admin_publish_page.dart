@@ -3,6 +3,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:universal_html/html.dart' as html;
 import '../../providers/providers.dart';
 import '../../themes/app_theme.dart';
 
@@ -28,6 +29,9 @@ class _AdminPublishPageState extends ConsumerState<AdminPublishPage> {
   bool _isUploadingImage = false;
   String? _statusMessage;
   bool _statusIsError = false;
+  int? _publishedArticleId;
+  String? _publishedArticleTitle;
+  String? _publishedArticleUrl;
 
   // Image source toggle, matching the wp-admin Publish News page: either a
   // pasted URL or a file uploaded straight into the WordPress Media Library.
@@ -155,12 +159,26 @@ class _AdminPublishPageState extends ConsumerState<AdminPublishPage> {
     );
   }
 
+  
+  String _computeShareUrl(dynamic id) {
+    try {
+      final origin = html.window.location.origin;
+      if (origin.isNotEmpty && !origin.contains('localhost') && !origin.contains('127.0.0.1')) {
+        return '$origin/article/$id';
+      }
+    } catch (_) {}
+    return 'https://sampaaathinews.vercel.app/article/$id';
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
       _isSubmitting = true;
       _statusMessage = null;
+      _publishedArticleId = null;
+      _publishedArticleTitle = null;
+      _publishedArticleUrl = null;
     });
 
     try {
@@ -187,9 +205,16 @@ class _AdminPublishPageState extends ConsumerState<AdminPublishPage> {
 
       if (!mounted) return;
 
+      final newId = response.data['id'];
+      final newTitle = _titleController.text.trim();
+      final shareUrl = _computeShareUrl(newId);
+
       setState(() {
-        _statusMessage = 'ಸುದ್ದಿ ಯಶಸ್ವಿಯಾಗಿ ಪ್ರಕಟಿಸಲಾಗಿದೆ! (Published — Post ID: ${response.data['id']})';
+        _statusMessage = 'ಸುದ್ದಿ ಯಶಸ್ವಿಯಾಗಿ ಪ್ರಕಟಿಸಲಾಗಿದೆ! (Published — Post ID: $newId)';
         _statusIsError = false;
+        _publishedArticleId = (newId is int) ? newId : int.tryParse('$newId');
+        _publishedArticleTitle = newTitle;
+        _publishedArticleUrl = shareUrl;
       });
 
       ref.invalidate(latestNewsProvider);
@@ -403,7 +428,79 @@ class _AdminPublishPageState extends ConsumerState<AdminPublishPage> {
                         keyboardType: TextInputType.number,
                         decoration: const InputDecoration(labelText: 'Reading time (minutes)', border: OutlineInputBorder()),
                       ),
-                      if (_statusMessage != null) ...[
+                      if (_publishedArticleId != null && _publishedArticleUrl != null) ...[
+                        Container(
+                          margin: const EdgeInsets.symmetric(vertical: 16),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade50,
+                            border: Border.all(color: Colors.green.shade300, width: 1.5),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.check_circle_rounded, color: Colors.green, size: 24),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      'ಸುದ್ದಿ ಯಶಸ್ವಿಯಾಗಿ ಪ್ರಕಟಿಸಲಾಗಿದೆ! (Published Successfully)',
+                                      style: TextStyle(
+                                        color: Colors.green.shade900,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                'ಹಂಚಿಕೊಳ್ಳಲು ಸಾರ್ವಜನಿಕ ಲಿಂಕ್ (Share Link):',
+                                style: TextStyle(color: Colors.grey.shade800, fontSize: 13, fontWeight: FontWeight.w600),
+                              ),
+                              const SizedBox(height: 4),
+                              SelectableText(
+                                _publishedArticleUrl!,
+                                style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 13),
+                              ),
+                              const SizedBox(height: 16),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: [
+                                  ElevatedButton.icon(
+                                    onPressed: () {
+                                      final text = Uri.encodeComponent('${_publishedArticleTitle ?? ''}\n$_publishedArticleUrl');
+                                      html.window.open('https://api.whatsapp.com/send?text=$text', '_blank');
+                                    },
+                                    icon: const Icon(Icons.chat_bubble_rounded, color: Colors.white, size: 18),
+                                    label: const Text('WhatsApp ಹಂಚಿಕೊಳ್ಳಿ', style: TextStyle(color: Colors.white)),
+                                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF25D366)),
+                                  ),
+                                  OutlinedButton.icon(
+                                    onPressed: () {
+                                      html.window.navigator.clipboard?.writeText(_publishedArticleUrl!);
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('ಲಿಂಕ್ ಕಾಪಿ ಮಾಡಲಾಗಿದೆ! (Link copied!)')),
+                                      );
+                                    },
+                                    icon: const Icon(Icons.copy_rounded, size: 18),
+                                    label: const Text('ಲಿಂಕ್ ಕಾಪಿ ಮಾಡಿ'),
+                                  ),
+                                  OutlinedButton.icon(
+                                    onPressed: () => context.go('/article/$_publishedArticleId'),
+                                    icon: const Icon(Icons.visibility_outlined, size: 18),
+                                    label: const Text('ಸುದ್ದಿ ವೀಕ್ಷಿಸಿ (View News)'),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ] else if (_statusMessage != null) ...[
                         const SizedBox(height: 16),
                         Text(
                           _statusMessage!,

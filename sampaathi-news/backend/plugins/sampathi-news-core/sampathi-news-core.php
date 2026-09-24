@@ -574,7 +574,7 @@ function sampathi_news_format_post_object( $post, $include_full_content = false 
         'categories_data' => $categories_data,
         'districts_data' => $districts_data,
         'reporter' => $reporter,
-        'share_url' => home_url("/article/$id"),
+        'share_url' => (defined('SAMPATHI_FRONTEND_URL') ? rtrim(SAMPATHI_FRONTEND_URL, '/') : (getenv('FRONTEND_URL') ? rtrim(getenv('FRONTEND_URL'), '/') : 'https://sampaaathinews.vercel.app')) . "/article/$id",
     ];
 }
 

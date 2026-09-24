@@ -867,29 +867,73 @@ class SocialShareRow extends StatelessWidget {
     required this.shareUrl,
   });
 
+  String get _finalUrl {
+    // 1. If shareUrl is already a valid public frontend URL (not local or backend)
+    if (shareUrl.isNotEmpty &&
+        !shareUrl.contains('localhost') &&
+        !shareUrl.contains('127.0.0.1') &&
+        !shareUrl.contains('.local') &&
+        !shareUrl.contains('onrender.com')) {
+      return shareUrl;
+    }
+
+    // 2. If running on web in the browser and the current site origin is not local
+    try {
+      final currentOrigin = html.window.location.origin;
+      if (currentOrigin.isNotEmpty &&
+          !currentOrigin.contains('localhost') &&
+          !currentOrigin.contains('127.0.0.1')) {
+        final currentHref = html.window.location.href;
+        if (currentHref.contains('/article/')) {
+          return currentHref;
+        }
+        final uri = Uri.tryParse(shareUrl);
+        if (uri != null && uri.path.contains('/article/')) {
+          return '$currentOrigin${uri.path}';
+        }
+      }
+    } catch (_) {}
+
+    // 3. Fallback to production frontend with article path/id
+    final uri = Uri.tryParse(shareUrl);
+    if (uri != null && uri.path.contains('/article/')) {
+      return 'https://sampaaathinews.vercel.app${uri.path}';
+    }
+    if (shareUrl.contains('id=')) {
+      final idParam = Uri.tryParse(shareUrl)?.queryParameters['id'];
+      if (idParam != null && idParam.isNotEmpty) {
+        return 'https://sampaaathinews.vercel.app/article/$idParam';
+      }
+    }
+    return shareUrl.isNotEmpty && !shareUrl.contains('localhost') && !shareUrl.contains('127.0.0.1')
+        ? shareUrl
+        : 'https://sampaaathinews.vercel.app';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final urlToShare = _finalUrl;
     return Row(
       children: [
         _shareIcon(
           icon: Icons.chat_bubble_rounded,
           color: const Color(0xFF25D366), // WhatsApp Green
           tooltip: 'WhatsApp ಹಂಚಿಕೊಳ್ಳಿ',
-          onPressed: () => _openUrl('https://api.whatsapp.com/send?text=${Uri.encodeComponent('$title\n$shareUrl')}'),
+          onPressed: () => _openUrl('https://api.whatsapp.com/send?text=${Uri.encodeComponent('$title\n$urlToShare')}'),
         ),
         const SizedBox(width: 12),
         _shareIcon(
           icon: Icons.send_rounded,
           color: const Color(0xFF0088cc), // Telegram Blue
           tooltip: 'Telegram ಹಂಚಿಕೊಳ್ಳಿ',
-          onPressed: () => _openUrl('https://t.me/share/url?url=${Uri.encodeComponent(shareUrl)}&text=${Uri.encodeComponent(title)}'),
+          onPressed: () => _openUrl('https://t.me/share/url?url=${Uri.encodeComponent(urlToShare)}&text=${Uri.encodeComponent(title)}'),
         ),
         const SizedBox(width: 12),
         _shareIcon(
           icon: Icons.close_fullscreen_outlined,
           color: Colors.black, // X Logo Black
           tooltip: 'X ಹಂಚಿಕೊಳ್ಳಿ',
-          onPressed: () => _openUrl('https://twitter.com/intent/tweet?url=${Uri.encodeComponent(shareUrl)}&text=${Uri.encodeComponent(title)}'),
+          onPressed: () => _openUrl('https://twitter.com/intent/tweet?url=${Uri.encodeComponent(urlToShare)}&text=${Uri.encodeComponent(title)}'),
         ),
         const SizedBox(width: 12),
         _shareIcon(
@@ -897,7 +941,7 @@ class SocialShareRow extends StatelessWidget {
           color: AppTheme.greyColor,
           tooltip: 'ಲಿಂಕ್ ಕಾಪಿ ಮಾಡಿ',
           onPressed: () {
-            html.window.navigator.clipboard?.writeText(shareUrl);
+            html.window.navigator.clipboard?.writeText(urlToShare);
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('ಲಿಂಕ್ ಕಾಪಿ ಮಾಡಲಾಗಿದೆ!'), duration: Duration(seconds: 2)),
             );

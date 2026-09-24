@@ -152,8 +152,20 @@ class Article {
       categories: catList,
       districts: distList,
       reporter: Reporter.fromJson(json['reporter'] ?? {}),
-      shareUrl: json['share_url'] ?? 'https://sampathinews.com/article/${json['id']}',
+      shareUrl: _sanitizeShareUrl(json['share_url'], json['id']),
     );
+  }
+
+  static String _sanitizeShareUrl(dynamic rawUrl, dynamic id) {
+    if (rawUrl is String &&
+        rawUrl.isNotEmpty &&
+        !rawUrl.contains('localhost') &&
+        !rawUrl.contains('127.0.0.1') &&
+        !rawUrl.contains('.local') &&
+        !rawUrl.contains('onrender.com')) {
+      return rawUrl;
+    }
+    return 'https://sampaaathinews.vercel.app/article/$id';
   }
 
   Map<String, dynamic> toJson() {

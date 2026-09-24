@@ -186,6 +186,38 @@
             reader.readAsDataURL(file);
         }
 
+        
+        function showSuccessCard(article, shareUrl) {
+            let container = document.getElementById('success-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'success-container';
+                const mainForm = document.getElementById('news-publish-form');
+                mainForm.parentNode.insertBefore(container, mainForm);
+            }
+            container.style = 'background: #f0fdf4; border: 2px solid #86efac; border-radius: 8px; padding: 20px; margin-bottom: 24px; text-align: left; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);';
+            container.innerHTML = `
+                <h3 style="color: #166534; margin-top: 0; font-size: 18px;">✅ ಸುದ್ದಿ ಯಶಸ್ವಿಯಾಗಿ ಪ್ರಕಟಿಸಲಾಗಿದೆ! (Published Successfully!)</h3>
+                <p style="margin: 8px 0; font-weight: 600; color: #1e293b; font-size: 15px;">${article.title}</p>
+                <p style="margin: 8px 0; font-size: 13px; color: #475569;">ಹಂಚಿಕೊಳ್ಳಲು ಸಾರ್ವಜನಿಕ ಲಿಂಕ್ (Public Share Link):</p>
+                <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 4px; padding: 10px 12px; margin-bottom: 16px; font-family: monospace; font-size: 13px; word-break: break-all; color: #2563eb; font-weight: bold;">
+                    ${shareUrl}
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(article.title + '\n' + shareUrl)}" target="_blank" style="background: #25D366; color: #ffffff; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+                        💬 WhatsApp ಹಂಚಿಕೊಳ್ಳಿ
+                    </a>
+                    <button type="button" onclick="navigator.clipboard.writeText('${shareUrl}'); alert('ಲಿಂಕ್ ಕಾಪಿ ಮಾಡಲಾಗಿದೆ! (Link copied!)');" style="background: #0f172a; color: #ffffff; padding: 10px 18px; border-radius: 6px; border: none; font-weight: bold; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                        📋 ಲಿಂಕ್ ಕಾಪಿ ಮಾಡಿ (Copy Link)
+                    </button>
+                    <a href="/?id=${article.id}" style="background: #dc2626; color: #ffffff; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+                        👁️ ಸುದ್ದಿ ವೀಕ್ಷಿಸಿ (View News)
+                    </a>
+                </div>
+            `;
+            container.scrollIntoView({ behavior: 'smooth' });
+        }
+
         function publishNews(e) {
             e.preventDefault();
             const title = document.getElementById('news-title').value;
@@ -227,8 +259,11 @@
             })
             .then(res => res.json())
             .then(article => {
-                alert('Congratulations! Your news article has been published successfully. Redirecting you to the homepage to see it live.');
-                window.location.href = '/';
+                const shareUrl = (window.location.origin && !window.location.origin.includes('localhost') && !window.location.origin.includes('127.0.0.1'))
+                    ? `${window.location.origin}/article/${article.id}`
+                    : `https://sampaaathinews.vercel.app/article/${article.id}`;
+
+                showSuccessCard(article, shareUrl);
             });
         }
     </script>

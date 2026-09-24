@@ -167,9 +167,30 @@
             fetchAds();
             initTheme();
             checkRole();
+            checkUrlForArticle();
         });
 
         // Authentication & Role Management
+        
+        function checkUrlForArticle() {
+            let articleId = null;
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('id')) {
+                articleId = urlParams.get('id');
+            }
+            if (!articleId && window.location.pathname) {
+                const match = window.location.pathname.match(/\/article\/([0-9]+)/);
+                if (match) articleId = match[1];
+            }
+            if (!articleId && window.location.hash) {
+                const match = window.location.hash.match(/\/article\/([0-9]+)/);
+                if (match) articleId = match[1];
+            }
+            if (articleId) {
+                setTimeout(() => openArticle(articleId), 250);
+            }
+        }
+
         function checkRole() {
             const role = localStorage.getItem('user_role');
             const linkPublish = document.getElementById('link-publish');
@@ -484,6 +505,18 @@
                     const modal = document.getElementById('article-modal');
                     const body = document.getElementById('modal-article-body');
 
+                    // Ensure public shareable URL (never share localhost or internal links)
+                    let shareLink = '';
+                    if (window.location.origin && !window.location.origin.includes('localhost') && !window.location.origin.includes('127.0.0.1')) {
+                        shareLink = `${window.location.origin}/article/${art.id}`;
+                    } else {
+                        shareLink = `https://sampaaathinews.vercel.app/article/${art.id}`;
+                    }
+
+                    if (window.history.pushState) {
+                        window.history.pushState(null, '', '/article/' + art.id);
+                    }
+
                     // Compile details markup
                     body.innerHTML = `
                         <span class="modal-badge">${art.categories_data[0].name}</span>
@@ -504,9 +537,9 @@
                         <!-- Share links -->
                         <div class="share-links">
                             <strong>ಸುದ್ದಿ ಶೇರ್ ಮಾಡಿ: </strong>
-                            <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(art.title + '\n' + art.share_url)}" target="_blank" class="share-btn whatsapp">WhatsApp</a>
-                            <a href="https://t.me/share/url?url=${encodeURIComponent(art.share_url)}&text=${encodeURIComponent(art.title)}" target="_blank" class="share-btn telegram">Telegram</a>
-                            <button class="share-btn copy" onclick="navigator.clipboard.writeText('${art.share_url}'); alert('ಲಿಂಕ್ ಕಾಪಿ ಮಾಡಲಾಗಿದೆ!')">Copy Link</button>
+                            <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(art.title + '\n' + shareLink)}" target="_blank" class="share-btn whatsapp">WhatsApp</a>
+                            <a href="https://t.me/share/url?url=${encodeURIComponent(shareLink)}&text=${encodeURIComponent(art.title)}" target="_blank" class="share-btn telegram">Telegram</a>
+                            <button class="share-btn copy" onclick="navigator.clipboard.writeText('${shareLink}'); alert('ಲಿಂಕ್ ಕಾಪಿ ಮಾಡಲಾಗಿದೆ!')">Copy Link</button>
                         </div>
 
                         <div class="modal-content-html">
@@ -543,6 +576,7 @@
 
         function closeModal() {
             document.getElementById('article-modal').style.display = 'none';
+            if (window.history.pushState) { window.history.pushState(null, '', '/'); }
         }
 
         // Drawer controllers
