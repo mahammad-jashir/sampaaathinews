@@ -858,6 +858,10 @@ class ShimmerLoadingCard extends StatelessWidget {
 
 // --- SOCIAL SHARE ROW ---
 class SocialShareRow extends StatelessWidget {
+  static String formatWhatsAppMessage(String title, String url) {
+    return '▶️ $title\n\n$url\n\n➡️ ವಾರ್ತಾ ವರದಿಗಾಗಿ ಸಂಪರ್ಕಿಸಿ : 8792462142\n\n🥏 ಸಂಪಾತಿ ನ್ಯೂಸ್ ವಾಟ್ಸಪ್ ಗ್ರೂಪ್ ಲಿಂಕ್\nhttps://chat.whatsapp.com/GOB3eLICQWc9T9j4hqX4IL\n\n🟢 ವಾಟ್ಸಪ್ ಚಾನೆಲ್ ಲಿಂಕ್\nhttps://whatsapp.com/channel/0029Vb40h6N90x34iudUFp3j';
+  }
+
   final String title;
   final String shareUrl;
 
@@ -919,7 +923,7 @@ class SocialShareRow extends StatelessWidget {
           icon: Icons.chat_bubble_rounded,
           color: const Color(0xFF25D366), // WhatsApp Green
           tooltip: 'WhatsApp ಹಂಚಿಕೊಳ್ಳಿ',
-          onPressed: () => _openUrl('https://api.whatsapp.com/send?text=${Uri.encodeComponent('$title\n$urlToShare')}'),
+          onPressed: () => _openUrl('https://api.whatsapp.com/send?text=${Uri.encodeComponent(formatWhatsAppMessage(title, urlToShare))}'),
         ),
         const SizedBox(width: 12),
         _shareIcon(

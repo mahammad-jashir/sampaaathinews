@@ -517,6 +517,8 @@
                         window.history.pushState(null, '', '/article/' + art.id);
                     }
 
+                                        const whatsappMessage = `▶️ ${art.title}\n\n${shareLink}\n\n➡️ ವಾರ್ತಾ ವರದಿಗಾಗಿ ಸಂಪರ್ಕಿಸಿ : 8792462142\n\n🥏 ಸಂಪಾತಿ ನ್ಯೂಸ್ ವಾಟ್ಸಪ್ ಗ್ರೂಪ್ ಲಿಂಕ್\nhttps://chat.whatsapp.com/GOB3eLICQWc9T9j4hqX4IL\n\n🟢 ವಾಟ್ಸಪ್ ಚಾನೆಲ್ ಲಿಂಕ್\nhttps://whatsapp.com/channel/0029Vb40h6N90x34iudUFp3j`;
+
                     // Compile details markup
                     body.innerHTML = `
                         <span class="modal-badge">${art.categories_data[0].name}</span>
@@ -537,7 +539,7 @@
                         <!-- Share links -->
                         <div class="share-links">
                             <strong>ಸುದ್ದಿ ಶೇರ್ ಮಾಡಿ: </strong>
-                            <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(art.title + '\n' + shareLink)}" target="_blank" class="share-btn whatsapp">WhatsApp</a>
+                            <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappMessage)}" target="_blank" class="share-btn whatsapp">WhatsApp</a>
                             <a href="https://t.me/share/url?url=${encodeURIComponent(shareLink)}&text=${encodeURIComponent(art.title)}" target="_blank" class="share-btn telegram">Telegram</a>
                             <button class="share-btn copy" onclick="navigator.clipboard.writeText('${shareLink}'); alert('ಲಿಂಕ್ ಕಾಪಿ ಮಾಡಲಾಗಿದೆ!')">Copy Link</button>
                         </div>

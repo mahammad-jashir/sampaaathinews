@@ -473,8 +473,10 @@ class _AdminPublishPageState extends ConsumerState<AdminPublishPage> {
                                 children: [
                                   ElevatedButton.icon(
                                     onPressed: () {
-                                      final text = Uri.encodeComponent('${_publishedArticleTitle ?? ''}\n$_publishedArticleUrl');
-                                      html.window.open('https://api.whatsapp.com/send?text=$text', '_blank');
+                                      final title = _publishedArticleTitle ?? '';
+                                      final url = _publishedArticleUrl ?? '';
+                                      final msg = '▶️ $title\n\n$url\n\n➡️ ವಾರ್ತಾ ವರದಿಗಾಗಿ ಸಂಪರ್ಕಿಸಿ : 8792462142\n\n🥏 ಸಂಪಾತಿ ನ್ಯೂಸ್ ವಾಟ್ಸಪ್ ಗ್ರೂಪ್ ಲಿಂಕ್\nhttps://chat.whatsapp.com/GOB3eLICQWc9T9j4hqX4IL\n\n🟢 ವಾಟ್ಸಪ್ ಚಾನೆಲ್ ಲಿಂಕ್\nhttps://whatsapp.com/channel/0029Vb40h6N90x34iudUFp3j';
+                                      html.window.open('https://api.whatsapp.com/send?text=${Uri.encodeComponent(msg)}', '_blank');
                                     },
                                     icon: const Icon(Icons.chat_bubble_rounded, color: Colors.white, size: 18),
                                     label: const Text('WhatsApp ಹಂಚಿಕೊಳ್ಳಿ', style: TextStyle(color: Colors.white)),

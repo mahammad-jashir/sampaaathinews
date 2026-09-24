@@ -431,9 +431,39 @@ app.post('/wp-json/sampathi/v1/news/add', (req, res) => {
 });
 
 
-// Serve single article route (loads index.html which auto-opens article modal)
+// Serve single article route with injected OpenGraph tags for rich WhatsApp previews
 app.get('/article/:id', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  const article = articles.find(a => a.id == req.params.id);
+  const indexPath = path.join(__dirname, 'public', 'index.html');
+  if (fs.existsSync(indexPath)) {
+    let html = fs.readFileSync(indexPath, 'utf8');
+    if (article) {
+      const cleanTitle = (article.title || '').replace(/"/g, '&quot;');
+      const cleanExcerpt = (article.excerpt || article.subtitle || '').replace(/<[^>]*>?/gm, '').replace(/"/g, '&quot;');
+      const imageUrl = article.featured_image_url || 'https://sampaaathinews.vercel.app/assets/images/logo.png';
+      const host = req.get('host') || 'localhost:3000';
+      const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
+      const shareUrl = isLocal ? `https://sampaaathinews.vercel.app/article/${article.id}` : `${req.protocol}://${host}/article/${article.id}`;
+
+      const ogMeta = `
+  <title>${cleanTitle} | ಸಂಪಾತಿ ನ್ಯೂಸ್</title>
+  <meta property="og:site_name" content="ಸಂಪಾತಿ ನ್ಯೂಸ್ | Sampathi News">
+  <meta property="og:title" content="${cleanTitle}">
+  <meta property="og:description" content="${cleanExcerpt}">
+  <meta property="og:image" content="${imageUrl}">
+  <meta property="og:image:secure_url" content="${imageUrl}">
+  <meta property="og:url" content="${shareUrl}">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${cleanTitle}">
+  <meta name="twitter:description" content="${cleanExcerpt}">
+  <meta name="twitter:image" content="${imageUrl}">
+`;
+      html = html.replace('</head>', `${ogMeta}\n</head>`);
+    }
+    return res.status(200).send(html);
+  }
+  res.sendFile(indexPath);
 });
 
 // Legacy / fallback route for article.html?id=...
