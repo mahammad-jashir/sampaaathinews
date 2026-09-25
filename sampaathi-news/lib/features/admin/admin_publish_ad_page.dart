@@ -378,7 +378,15 @@ class _AdminPublishAdPageState extends ConsumerState<AdminPublishAdPage> {
                               const SizedBox(height: 8),
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(6),
-                                child: Image.memory(_selectedImageFile!.bytes!, height: 100, fit: BoxFit.cover),
+                                child: Container(
+                                  constraints: const BoxConstraints(maxHeight: 220),
+                                  color: Colors.grey[100],
+                                  child: Image.memory(
+                                    _selectedImageFile!.bytes!,
+                                    width: double.infinity,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
                               ),
                             ],
                           ] else

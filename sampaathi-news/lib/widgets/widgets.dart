@@ -729,16 +729,14 @@ class _AdBannerState extends ConsumerState<AdBanner> {
           clipBehavior: widget.edgeToEdge ? Clip.none : Clip.antiAlias,
           child: Stack(
             children: [
-              // A fixed, banner-like aspect ratio keeps every ad the same
-              // clean shape regardless of the uploaded image's own
-              // dimensions — avoids the "sometimes tall, sometimes short"
-              // look from letting fitWidth set the height freely.
-              AspectRatio(
-                aspectRatio: 3.4,
+              // Renders the full, uncropped advertisement exactly as uploaded,
+              // preserving its natural aspect ratio without any cropping.
+              ClipRRect(
+                borderRadius: BorderRadius.circular(widget.edgeToEdge ? 0 : 12),
                 child: SampathiImage(
                   ad.imageUrl,
                   width: double.infinity,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.fitWidth,
                 ),
               ),
               Positioned(
@@ -1008,7 +1006,7 @@ class SampathiImage extends StatelessWidget {
       placeholder: (context, url) => Shimmer.fromColors(
         baseColor: Colors.grey[300]!,
         highlightColor: Colors.grey[100]!,
-        child: Container(width: width, height: height, color: Colors.white),
+        child: Container(width: width, height: height ?? 140, color: Colors.white),
       ),
       errorWidget: (context, url, error) => _placeholder(),
     );
