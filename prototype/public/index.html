@@ -539,8 +539,9 @@
                         <!-- Share links -->
                         <div class="share-links">
                             <strong>ಸುದ್ದಿ ಶೇರ್ ಮಾಡಿ: </strong>
-                            <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappMessage)}" target="_blank" class="share-btn whatsapp">WhatsApp</a>
+                            <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappMessage)}" target="_blank" onclick="if(navigator.clipboard){navigator.clipboard.writeText(decodeURIComponent('${encodeURIComponent(whatsappMessage)}'));}" class="share-btn whatsapp">WhatsApp</a>
                             <a href="https://t.me/share/url?url=${encodeURIComponent(shareLink)}&text=${encodeURIComponent(art.title)}" target="_blank" class="share-btn telegram">Telegram</a>
+                            <button class="share-btn copy" onclick="navigator.clipboard.writeText(decodeURIComponent('${encodeURIComponent(whatsappMessage)}')); alert('ಸಂಪೂರ್ಣ ವಾಟ್ಸಪ್ ಸಂದೇಶ (ವಾಟ್ಸಪ್ ಚಾನೆಲ್ ಮತ್ತು ಗ್ರೂಪ್ ಲಿಂಕ್‌ಗಳೊಂದಿಗೆ) ಕಾಪಿ ಮಾಡಲಾಗಿದೆ!')">ಪೂರ್ಣ ಸಂದೇಶ ಕಾಪಿ</button>
                             <button class="share-btn copy" onclick="navigator.clipboard.writeText('${shareLink}'); alert('ಲಿಂಕ್ ಕಾಪಿ ಮಾಡಲಾಗಿದೆ!')">Copy Link</button>
                         </div>
 

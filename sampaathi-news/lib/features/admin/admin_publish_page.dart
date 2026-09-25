@@ -311,21 +311,35 @@ class _AdminPublishPageState extends ConsumerState<AdminPublishPage> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
+                    color: Colors.grey.shade50,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey.shade300),
+                    border: Border.all(color: Colors.green.shade200),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'ಹಂಚಿಕೊಳ್ಳಲು ಲೈವ್ ಲಿಂಕ್ (Public URL):',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black54),
+                      Row(
+                        children: [
+                          Icon(Icons.chat_bubble_outline_rounded, size: 16, color: Colors.green.shade800),
+                          const SizedBox(width: 6),
+                          Text(
+                            'ಹಂಚಿಕೊಳ್ಳುವ ಪೂರ್ಣ ವಾಟ್ಸಪ್ ಸಂದೇಶ (Full Message):',
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.green.shade900),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 4),
-                      SelectableText(
-                        shareUrl,
-                        style: const TextStyle(fontSize: 13, color: Colors.blue, fontWeight: FontWeight.bold),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: SelectableText(
+                          fullWhatsAppMsg,
+                          style: const TextStyle(fontSize: 12, color: Colors.black87, height: 1.45),
+                        ),
                       ),
                     ],
                   ),
@@ -333,13 +347,16 @@ class _AdminPublishPageState extends ConsumerState<AdminPublishPage> {
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
                   onPressed: () {
+                    try {
+                      html.window.navigator.clipboard?.writeText(fullWhatsAppMsg);
+                    } catch (_) {}
                     html.window.open(
                       'https://api.whatsapp.com/send?text=${Uri.encodeComponent(fullWhatsAppMsg)}',
                       '_blank',
                     );
                   },
                   icon: const Icon(Icons.chat_bubble_rounded, color: Colors.white, size: 20),
-                  label: const Text('💬 WhatsApp ಹಂಚಿಕೊಳ್ಳಿ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  label: const Text('💬 WhatsApp ಹಂಚಿಕೊಳ್ಳಿ (ಪೂರ್ಣ ಸಂದೇಶ)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF25D366),
                     padding: const EdgeInsets.symmetric(vertical: 12),
@@ -703,13 +720,21 @@ class _AdminPublishPageState extends ConsumerState<AdminPublishPage> {
                               ),
                               const SizedBox(height: 12),
                               Text(
-                                'ಹಂಚಿಕೊಳ್ಳಲು ಸಾರ್ವಜನಿಕ ಲಿಂಕ್ (Share Link):',
+                                'ಹಂಚಿಕೊಳ್ಳುವ ಪೂರ್ಣ ವಾಟ್ಸಪ್ ಸಂದೇಶ (Full WhatsApp Message):',
                                 style: TextStyle(color: Colors.grey.shade800, fontSize: 13, fontWeight: FontWeight.w600),
                               ),
-                              const SizedBox(height: 4),
-                              SelectableText(
-                                _publishedArticleUrl!,
-                                style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 13),
+                              const SizedBox(height: 6),
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: Colors.grey.shade300),
+                                ),
+                                child: SelectableText(
+                                  '▶️ ${_publishedArticleTitle ?? ''}\n\n$_publishedArticleUrl\n\n➡️ ವಾರ್ತಾ ವರದಿಗಾಗಿ ಸಂಪರ್ಕಿಸಿ : 8792462142\n\n🥏 ಸಂಪಾತಿ ನ್ಯೂಸ್ ವಾಟ್ಸಪ್ ಗ್ರೂಪ್ ಲಿಂಕ್\nhttps://chat.whatsapp.com/GOB3eLICQWc9T9j4hqX4IL\n\n🟢 ವಾಟ್ಸಪ್ ಚಾನೆಲ್ ಲಿಂಕ್\nhttps://whatsapp.com/channel/0029Vb40h6N90x34iudUFp3j',
+                                  style: const TextStyle(color: Colors.black87, fontSize: 12, height: 1.45),
+                                ),
                               ),
                               const SizedBox(height: 16),
                               Wrap(
@@ -721,10 +746,13 @@ class _AdminPublishPageState extends ConsumerState<AdminPublishPage> {
                                       final title = _publishedArticleTitle ?? '';
                                       final url = _publishedArticleUrl ?? '';
                                       final msg = '▶️ $title\n\n$url\n\n➡️ ವಾರ್ತಾ ವರದಿಗಾಗಿ ಸಂಪರ್ಕಿಸಿ : 8792462142\n\n🥏 ಸಂಪಾತಿ ನ್ಯೂಸ್ ವಾಟ್ಸಪ್ ಗ್ರೂಪ್ ಲಿಂಕ್\nhttps://chat.whatsapp.com/GOB3eLICQWc9T9j4hqX4IL\n\n🟢 ವಾಟ್ಸಪ್ ಚಾನೆಲ್ ಲಿಂಕ್\nhttps://whatsapp.com/channel/0029Vb40h6N90x34iudUFp3j';
+                                      try {
+                                        html.window.navigator.clipboard?.writeText(msg);
+                                      } catch (_) {}
                                       html.window.open('https://api.whatsapp.com/send?text=${Uri.encodeComponent(msg)}', '_blank');
                                     },
                                     icon: const Icon(Icons.chat_bubble_rounded, color: Colors.white, size: 18),
-                                    label: const Text('WhatsApp ಹಂಚಿಕೊಳ್ಳಿ', style: TextStyle(color: Colors.white)),
+                                    label: const Text('WhatsApp ಹಂಚಿಕೊಳ್ಳಿ (ಪೂರ್ಣ ಸಂದೇಶ)', style: TextStyle(color: Colors.white)),
                                     style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF25D366)),
                                   ),
                                   OutlinedButton.icon(

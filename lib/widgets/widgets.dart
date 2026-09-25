@@ -921,7 +921,13 @@ class SocialShareRow extends StatelessWidget {
           icon: Icons.chat_bubble_rounded,
           color: const Color(0xFF25D366), // WhatsApp Green
           tooltip: 'WhatsApp ಹಂಚಿಕೊಳ್ಳಿ',
-          onPressed: () => _openUrl('https://api.whatsapp.com/send?text=${Uri.encodeComponent(formatWhatsAppMessage(title, urlToShare))}'),
+          onPressed: () {
+            final msg = formatWhatsAppMessage(title, urlToShare);
+            try {
+              html.window.navigator.clipboard?.writeText(msg);
+            } catch (_) {}
+            _openUrl('https://api.whatsapp.com/send?text=${Uri.encodeComponent(msg)}');
+          },
         ),
         const SizedBox(width: 12),
         _shareIcon(
