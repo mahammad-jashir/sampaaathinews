@@ -1,0 +1,28 @@
+[
+  {
+    "id": 501,
+    "business_name": "ಕರಾವಳಿ ಫ್ರೆಶ್ ಫಿಶ್ (Karavali Fresh Fish)",
+    "title": "ತಾಜಾ ಸಮುದ್ರದ ಮೀನುಗಳು - ನಿಮ್ಮ ಮನೆ ಬಾಗಿಲಿಗೆ",
+    "image_url": "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=1200",
+    "landing_url": "https://sampathinews.com",
+    "position": "header_banner",
+    "package": "gold",
+    "start_date": "2026-09-24T08:58:16.719Z",
+    "end_date": "2026-09-26T08:58:16.719Z",
+    "status": "active",
+    "priority": 5
+  },
+  {
+    "id": 502,
+    "business_name": "ಕೆವಿಜಿ ಎಜುಕೇಷನ್ ಫೌಂಡೇಶನ್ (KVG Educational)",
+    "title": "ಪ್ರವೇಶಾತಿಗೆ ಸೀಟುಗಳು ಲಭ್ಯವಿವೆ - ಸುಳ್ಯ ಕ್ಯಾಂಪಸ್",
+    "image_url": "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?w=600",
+    "landing_url": "https://sampathinews.com",
+    "position": "sidebar_banner",
+    "package": "platinum",
+    "start_date": "2026-09-24T08:58:16.719Z",
+    "end_date": "2026-09-26T08:58:16.719Z",
+    "status": "active",
+    "priority": 4
+  }
+]

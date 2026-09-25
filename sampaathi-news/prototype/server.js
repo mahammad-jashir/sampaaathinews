@@ -122,6 +122,22 @@ let articles = [
     districts_data: [districts[4]],
     reporter: reporters[0],
     share_url: `${FRONTEND_URL}/article/4`
+  },
+  {
+    id: 1790317731256,
+    title: 'ಕಾರಿಗೆ ನಾಯಿ ಅಡ್ಡ',
+    subtitle: '',
+    excerpt: 'ಕಾರಿಗೆ ನಾಯಿ ಅಡ್ಡ ಬಂದ ಪರಿಣಾಮ ಸಂಭವಿಸಿದ ಘಟನೆ. ಹೆಚ್ಚಿನ ಮಾಹಿತಿ ನಿರೀಕ್ಷಿಸಲಾಗುತ್ತಿದೆ.',
+    content: '<p>ಕಾರಿಗೆ ನಾಯಿ ಅಡ್ಡ ಬಂದ ಪರಿಣಾಮ ಸಂಭವಿಸಿದ ಘಟನೆ.</p>',
+    featured_image_url: 'https://sampaaathinews.vercel.app/assets/images/article_1790317731256.jpg',
+    date_published: new Date().toISOString(),
+    date_modified: new Date().toISOString(),
+    reading_time: 3,
+    view_count: 520,
+    categories_data: [categories[0], categories[1]],
+    districts_data: [districts[0]],
+    reporter: reporters[0],
+    share_url: `${FRONTEND_URL}/article/1790317731256`
   }
 ];
 
@@ -494,6 +510,42 @@ app.post('/wp-json/sampathi/v1/news/add', (req, res) => {
 });
 
 
+// Image serving endpoint for binary image delivery to WhatsApp / OpenGraph crawlers
+function handleArticleImage(req, res) {
+  const id = req.params.id;
+  const localFile = path.join(__dirname, 'public', 'assets', 'images', `article_${id}.jpg`);
+  if (fs.existsSync(localFile)) {
+    const buf = fs.readFileSync(localFile);
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.setHeader('Content-Length', buf.length);
+    res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=86400');
+    return res.end(buf);
+  }
+
+  const article = articles.find(a => a.id == id);
+  if (!article || !article.featured_image_url) {
+    return res.redirect('https://sampaaathinews.vercel.app/assets/images/logo.png');
+  }
+  const img = article.featured_image_url;
+  if (img.startsWith('data:image/')) {
+    const matches = img.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
+    const mime = matches ? `image/${matches[1]}` : 'image/jpeg';
+    const b64 = matches ? matches[2] : img.split(';base64,').pop();
+    const buffer = Buffer.from(b64, 'base64');
+    res.setHeader('Content-Type', mime);
+    res.setHeader('Content-Length', buffer.length);
+    res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=86400');
+    return res.end(buffer);
+  } else if (img.startsWith('http://') || img.startsWith('https://')) {
+    return res.redirect(img);
+  }
+  return res.redirect('https://sampaaathinews.vercel.app/assets/images/logo.png');
+}
+
+app.get('/article/:id/image.jpg', handleArticleImage);
+app.get('/article/:id/image', handleArticleImage);
+app.get('/wp-json/sampathi/v1/news/:id/image', handleArticleImage);
+
 // Serve single article route with injected OpenGraph tags for rich WhatsApp previews
 app.get('/article/:id', (req, res) => {
   const article = articles.find(a => a.id == req.params.id);
@@ -503,7 +555,14 @@ app.get('/article/:id', (req, res) => {
     if (article) {
       const cleanTitle = (article.title || '').replace(/"/g, '&quot;');
       const cleanExcerpt = (article.excerpt || article.subtitle || '').replace(/<[^>]*>?/gm, '').replace(/"/g, '&quot;');
-      const imageUrl = article.featured_image_url || 'https://sampaaathinews.vercel.app/assets/images/logo.png';
+      let imageUrl = 'https://sampaaathinews.vercel.app/assets/images/logo.png';
+      if (article.featured_image_url) {
+        if (article.featured_image_url.startsWith('data:image/')) {
+          imageUrl = `https://sampaaathinews.vercel.app/article/${article.id}/image.jpg`;
+        } else if (article.featured_image_url.startsWith('http')) {
+          imageUrl = article.featured_image_url;
+        }
+      }
       const host = req.get('host') || 'localhost:3000';
       const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
       const shareUrl = isLocal ? `https://sampaaathinews.vercel.app/article/${article.id}` : `${req.protocol}://${host}/article/${article.id}`;
@@ -515,6 +574,9 @@ app.get('/article/:id', (req, res) => {
   <meta property="og:description" content="${cleanExcerpt}">
   <meta property="og:image" content="${imageUrl}">
   <meta property="og:image:secure_url" content="${imageUrl}">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta property="og:url" content="${shareUrl}">
   <meta property="og:type" content="article">
   <meta name="twitter:card" content="summary_large_image">

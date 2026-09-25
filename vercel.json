@@ -1,11 +1,23 @@
 {
   "rewrites": [
     {
+      "source": "/article/:id/image.jpg",
+      "destination": "/api/image?id=:id"
+    },
+    {
+      "source": "/article/:id/image",
+      "destination": "/api/image?id=:id"
+    },
+    {
+      "source": "/api/image",
+      "destination": "/api/image"
+    },
+    {
       "source": "/article/:id",
       "destination": "/api/article?id=:id"
     },
     {
-      "source": "/((?!assets/|.*\\.js|.*\\.png|.*\\.json|.*\\.wasm|.*\\.html|.*\\.css|.*\\.txt|.*\\.ico).*)$",
+      "source": "/((?!assets/|.*\\.js|.*\\.png|.*\\.jpg|.*\\.jpeg|.*\\.json|.*\\.wasm|.*\\.html|.*\\.css|.*\\.txt|.*\\.ico).*)$",
       "destination": "/index.html"
     }
   ]

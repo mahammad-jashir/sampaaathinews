@@ -949,6 +949,18 @@ class SocialShareRow extends StatelessWidget {
             );
           },
         ),
+        const SizedBox(width: 12),
+        _shareIcon(
+          icon: Icons.copy_all_rounded,
+          color: AppTheme.primaryColor,
+          tooltip: 'ಪೂರ್ಣ ಸಂದೇಶ ಕಾಪಿ ಮಾಡಿ (Copy Full Message)',
+          onPressed: () {
+            html.window.navigator.clipboard?.writeText(formatWhatsAppMessage(title, urlToShare));
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('ಸಂಪೂರ್ಣ ವಾಟ್ಸಪ್ ಸಂದೇಶ ಕಾಪಿ ಮಾಡಲಾಗಿದೆ!'), duration: Duration(seconds: 2)),
+            );
+          },
+        ),
       ],
     );
   }

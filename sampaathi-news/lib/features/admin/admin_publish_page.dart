@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -74,10 +75,22 @@ class _AdminPublishPageState extends ConsumerState<AdminPublishPage> {
         ),
       });
       final response = await apiClient.dio.post('/sampathi/v1/media/upload', data: formData);
-      return response.data['source_url'] as String?;
+      if (response.data != null && response.data['source_url'] != null) {
+        return response.data['source_url'] as String;
+      }
+    } catch (_) {
+      // Seamless fallback: return base64 Data URI if media endpoint is not available
+      final ext = _selectedImageFile!.extension?.toLowerCase() ?? 'jpeg';
+      final mime = (ext == 'png') ? 'image/png' : 'image/jpeg';
+      final b64 = base64Encode(_selectedImageFile!.bytes!);
+      return 'data:$mime;base64,$b64';
     } finally {
       if (mounted) setState(() => _isUploadingImage = false);
     }
+    // Final fallback
+    final ext = _selectedImageFile!.extension?.toLowerCase() ?? 'jpeg';
+    final mime = (ext == 'png') ? 'image/png' : 'image/jpeg';
+    return 'data:$mime;base64,${base64Encode(_selectedImageFile!.bytes!)}';
   }
 
   /// Shows a small "type a name, submit" dialog and POSTs it to the given
@@ -491,6 +504,19 @@ class _AdminPublishPageState extends ConsumerState<AdminPublishPage> {
                                     },
                                     icon: const Icon(Icons.copy_rounded, size: 18),
                                     label: const Text('ಲಿಂಕ್ ಕಾಪಿ ಮಾಡಿ'),
+                                  ),
+                                  OutlinedButton.icon(
+                                    onPressed: () {
+                                      final title = _publishedArticleTitle ?? '';
+                                      final url = _publishedArticleUrl ?? '';
+                                      final msg = '▶️ $title\n\n$url\n\n➡️ ವಾರ್ತಾ ವರದಿಗಾಗಿ ಸಂಪರ್ಕಿಸಿ : 8792462142\n\n🥏 ಸಂಪಾತಿ ನ್ಯೂಸ್ ವಾಟ್ಸಪ್ ಗ್ರೂಪ್ ಲಿಂಕ್\nhttps://chat.whatsapp.com/GOB3eLICQWc9T9j4hqX4IL\n\n🟢 ವಾಟ್ಸಪ್ ಚಾನೆಲ್ ಲಿಂಕ್\nhttps://whatsapp.com/channel/0029Vb40h6N90x34iudUFp3j';
+                                      html.window.navigator.clipboard?.writeText(msg);
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('ಸಂಪೂರ್ಣ ವಾಟ್ಸಪ್ ಸಂದೇಶ ಕಾಪಿ ಮಾಡಲಾಗಿದೆ!')),
+                                      );
+                                    },
+                                    icon: const Icon(Icons.assignment_outlined, size: 18),
+                                    label: const Text('ಪೂರ್ಣ ಸಂದೇಶ ಕಾಪಿ'),
                                   ),
                                   OutlinedButton.icon(
                                     onPressed: () => context.go('/article/$_publishedArticleId'),
