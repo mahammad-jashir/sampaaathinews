@@ -3,16 +3,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiClient {
   final Dio _dio;
-  // Points at your local WordPress site's REST API. Replace "sampathi-news.local"
-  // with your actual Local by Flywheel site domain if different. All content
-  // (news + ads) is now managed via wp-admin -> "Publish News" / "Ad Dashboard".
-  static const String baseUrl = 'http://sampathi-news.local/wp-json';
+  // Live Render backend is the default so production Vercel builds always work.
+  // Can be overridden via --dart-define=WORDPRESS_API_URL=... if desired.
+  static const String baseUrl = String.fromEnvironment(
+    'WORDPRESS_API_URL',
+    defaultValue: 'https://sampathi-backend.onrender.com/wp-json',
+  );
 
   ApiClient()
       : _dio = Dio(BaseOptions(
           baseUrl: baseUrl,
-          connectTimeout: const Duration(seconds: 10),
-          receiveTimeout: const Duration(seconds: 10),
+          connectTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 30),
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',

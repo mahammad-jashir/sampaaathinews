@@ -61,7 +61,56 @@ class _ArticlePageState extends ConsumerState<ArticlePage> {
       body: ResponsiveLayout(
         child: articleAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (err, stack) => const Center(child: Text('ಸುದ್ದಿ ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿಲ್ಲ...')),
+          error: (err, stack) => Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.feed_outlined, size: 64, color: Colors.grey[400]),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'ಸುದ್ದಿ ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'ಸರ್ವರ್ ಸಂಪರ್ಕದಲ್ಲಿ ತೊಂದರೆಯಾಗಿದೆ ಅಥವಾ ಇಂಟರ್ನೆಟ್ ಪರಿಶೀಲಿಸಿ.',
+                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () => ref.refresh(articleDetailsProvider(id)),
+                        icon: const Icon(Icons.refresh, size: 18),
+                        label: const Text('ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryColor,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                      ),
+                      OutlinedButton(
+                        onPressed: () => context.go('/'),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        child: const Text('ಮುಖಪುಟ'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
           data: (article) {
             // Trigger dynamic SEO Tags update
             SeoHelper.updateMetadata(

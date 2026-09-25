@@ -35,8 +35,8 @@ if [ -n "$WORDPRESS_API_URL" ]; then
   echo "Using WORDPRESS_API_URL: $WORDPRESS_API_URL"
   flutter build web --release --dart-define=WORDPRESS_API_URL="$WORDPRESS_API_URL"
 else
-  echo "Using default local URL (WORDPRESS_API_URL environment variable is not set)"
-  flutter build web --release
+  echo "Using default live Render URL (WORDPRESS_API_URL environment variable is not set)"
+  flutter build web --release --dart-define=WORDPRESS_API_URL="https://sampathi-backend.onrender.com/wp-json"
 fi
 
 echo "=== Build Complete ==="

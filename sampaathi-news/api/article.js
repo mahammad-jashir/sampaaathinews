@@ -9,7 +9,7 @@ module.exports = async (req, res) => {
   if (id) {
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 2500);
+      const timeout = setTimeout(() => controller.abort(), 6000);
       const resp = await fetch(`${baseUrl.replace(/\/$/, '')}/sampathi/v1/news/${id}`, {
         signal: controller.signal
       });
