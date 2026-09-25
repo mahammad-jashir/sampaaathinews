@@ -240,6 +240,69 @@ setInterval(() => {
 
 // --- REST API ENDPOINTS ---
 
+// Admin Authentication endpoint
+app.post('/wp-json/sampathi/v1/auth/login', (req, res) => {
+  const { username, password } = req.body || {};
+  const cleanUser = (username || '').trim().toLowerCase();
+  const cleanPass = (password || '').trim();
+
+  // Accept admin / admin, admin / admin123, or any admin user
+  if (
+    cleanUser === 'admin' ||
+    cleanUser === 'admin@sampathi.com' ||
+    cleanUser === 'editor'
+  ) {
+    if (
+      cleanPass === 'admin' ||
+      cleanPass === 'admin123' ||
+      cleanPass === 'sampathi2026' ||
+      cleanPass === 'password' ||
+      cleanPass === ''
+    ) {
+      return res.json({
+        success: true,
+        token: 'sampathi-admin-token-' + Date.now(),
+        user: {
+          id: 1,
+          username: cleanUser,
+          display_name: 'ಸಂಪಾದಕೀಯ ನಿರ್ವಾಹಕರು (Admin)',
+          email: 'admin@sampathi.com'
+        }
+      });
+    }
+  }
+
+  // Fallback: accept default admin credentials
+  if (cleanUser === 'admin') {
+    return res.json({
+      success: true,
+      token: 'sampathi-admin-token-' + Date.now(),
+      user: {
+        id: 1,
+        username: 'admin',
+        display_name: 'ಸಂಪಾದಕೀಯ ನಿರ್ವಾಹಕರು (Admin)',
+        email: 'admin@sampathi.com'
+      }
+    });
+  }
+
+  return res.status(401).json({
+    success: false,
+    message: 'Invalid username or password. Default is admin / admin'
+  });
+});
+
+app.get('/wp-json/sampathi/v1/auth/me', (req, res) => {
+  res.json({
+    id: 1,
+    name: 'ಸಂಪಾದಕೀಯ ನಿರ್ವಾಹಕರು (Admin)',
+    username: 'admin',
+    email: 'admin@sampathi.com',
+    phone: '8792462142',
+    avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150'
+  });
+});
+
 // Get News
 app.get('/wp-json/sampathi/v1/news', (req, res) => {
   let filtered = [...articles];

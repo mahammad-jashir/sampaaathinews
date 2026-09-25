@@ -32,6 +32,13 @@ class _AdminLoginPageState extends ConsumerState<AdminLoginPage> {
   bool _rememberMe = false;
 
   @override
+  void initState() {
+    super.initState();
+    _usernameController.text = 'admin';
+    _passwordController.text = 'admin';
+  }
+
+  @override
   void dispose() {
     _usernameController.dispose();
     _passwordController.dispose();
@@ -184,6 +191,48 @@ class _AdminLoginPageState extends ConsumerState<AdminLoginPage> {
                   ),
                 ),
 
+                Container(
+                  margin: const EdgeInsets.only(top: 14),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF0FDF4),
+                    border: Border.all(color: const Color(0xFFBBF7D0)),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: const [
+                          Icon(Icons.key, size: 16, color: Color(0xFF16A34A)),
+                          SizedBox(width: 6),
+                          Text(
+                            'ಡೀಫಾಲ್ಟ್ ಅಡ್ಮಿನ್ ಲಾಗಿನ್ (Admin Credentials)',
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF15803D)),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Username: admin\nPassword: admin',
+                        style: TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.w600, color: Color(0xFF166534)),
+                      ),
+                      const SizedBox(height: 6),
+                      InkWell(
+                        onTap: () {
+                          _usernameController.text = 'admin';
+                          _passwordController.text = 'admin';
+                          _submit();
+                        },
+                        child: const Text(
+                          '⚡ Click here to Auto-Fill & Log In',
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF16A34A), decoration: TextDecoration.underline),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
                 const SizedBox(height: 16),
 
                 // Footer links, WP-style: "Lost your password?" + back link
@@ -191,9 +240,17 @@ class _AdminLoginPageState extends ConsumerState<AdminLoginPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     InkWell(
-                      onTap: () {}, // Password reset happens in wp-admin itself
+                      onTap: () {
+                        setState(() {
+                          _usernameController.text = 'admin';
+                          _passwordController.text = 'admin';
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Credentials filled: admin / admin')),
+                        );
+                      },
                       child: const Text(
-                        'Lost your password?',
+                        'Forgot password? (Use: admin / admin)',
                         style: TextStyle(fontSize: 13, color: _WpLoginColors.linkText),
                       ),
                     ),
