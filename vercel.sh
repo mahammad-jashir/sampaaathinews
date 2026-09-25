@@ -39,4 +39,9 @@ else
   flutter build web --release --dart-define=WORDPRESS_API_URL="https://sampathi-backend.onrender.com/wp-json"
 fi
 
+echo "=== Ensuring build/web is populated at both root and sampaathi-news ==="
+mkdir -p ../build/web
+cp -r build/web/* ../build/web/ 2>/dev/null || true
+
 echo "=== Build Complete ==="
+

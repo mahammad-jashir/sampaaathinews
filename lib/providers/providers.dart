@@ -85,7 +85,9 @@ final districtsProvider = FutureProvider<List<District>>((ref) async {
 
 final breakingNewsProvider = FutureProvider<List<Article>>((ref) async {
   final repo = ref.watch(newsRepositoryProvider);
-  return repo.fetchArticles(categoryId: 1); // Category ID 1 is "ಪ್ರಮುಖ ಸುದ್ದಿ" (Breaking/Top stories)
+  final breaking = await repo.fetchArticles(categoryId: 1); // Category ID 1 is "ಪ್ರಮುಖ ಸುದ್ದಿ" (Breaking/Top stories)
+  if (breaking.isNotEmpty) return breaking;
+  return repo.fetchArticles();
 });
 
 final latestNewsProvider = FutureProvider<List<Article>>((ref) async {

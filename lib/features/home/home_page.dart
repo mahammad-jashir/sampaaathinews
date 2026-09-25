@@ -61,28 +61,28 @@ class HomePage extends ConsumerWidget {
         const AdBanner(position: 'header_banner', edgeToEdge: true),
 
         // Featured article: big image, tag pills over the image, headline +
-        // byline row below — matches the big lead story in the reference.
-        breakingNewsAsync.when(
+        // byline row below — displays the newest published article immediately at the top!
+        latestNewsAsync.when(
           loading: () => const ShimmerLoadingCard(),
           error: (err, stack) => const Padding(
             padding: EdgeInsets.all(24),
             child: Text('ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ...'),
           ),
-          data: (breakingArticles) {
-            if (breakingArticles.isEmpty) return const SizedBox();
-            final featured = breakingArticles.first;
-            final restOfBreaking = breakingArticles.skip(1).take(4).toList();
+          data: (latestArticles) {
+            if (latestArticles.isEmpty) return const SizedBox();
+            final featured = latestArticles.first;
+            final restOfArticles = latestArticles.skip(1).take(4).toList();
 
             return Column(
               children: [
                 _buildMobileFeaturedCard(context, featured),
                 // Short list right under the featured headline, exactly like
                 // the reference (small thumbnail + byline + read time + bookmark).
-                if (restOfBreaking.isNotEmpty)
+                if (restOfArticles.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Column(
-                      children: restOfBreaking.map((a) => _buildMobileListRow(context, a)).toList(),
+                      children: restOfArticles.map((a) => _buildMobileListRow(context, a)).toList(),
                     ),
                   ),
               ],
@@ -120,7 +120,7 @@ class HomePage extends ConsumerWidget {
       grouped.putIfAbsent(categoryName, () => []).add(article);
     }
 
-    final sections = grouped.entries.where((e) => e.value.length >= 2).take(4).toList();
+    final sections = grouped.entries.where((e) => e.value.isNotEmpty).take(8).toList();
 
     return Column(
       children: sections.map((entry) {
@@ -415,7 +415,7 @@ class HomePage extends ConsumerWidget {
                     const SizedBox(height: 16),
 
                     // Hero Slider / Showcase
-                    breakingNewsAsync.when(
+                    latestNewsAsync.when(
                       loading: () => const ShimmerLoadingCard(),
                       error: (err, stack) => const Text('ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ...'),
                       data: (articles) {
@@ -467,7 +467,7 @@ class HomePage extends ConsumerWidget {
                       ),
                       error: (err, stack) => Text('Error: $err'),
                       data: (articles) {
-                        final gridArticles = articles.skip(1).toList();
+                        final gridArticles = articles.length > 1 ? articles.skip(1).toList() : articles;
                         return GridView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),

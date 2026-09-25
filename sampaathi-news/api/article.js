@@ -9,7 +9,7 @@ module.exports = async (req, res) => {
   if (id) {
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 6000);
+      const timeout = setTimeout(() => controller.abort(), 15000);
       const resp = await fetch(`${baseUrl.replace(/\/$/, '')}/sampathi/v1/news/${id}`, {
         signal: controller.signal
       });
@@ -18,7 +18,27 @@ module.exports = async (req, res) => {
         article = await resp.json();
       }
     } catch (e) {
-      // Backend sleeping or network error; fall back to static/seed dictionary
+      // Backend sleeping or network error; fall back to static/seed dictionary & database
+    }
+  }
+
+  // Check prototype/news_db.json if available
+  if (!article && id) {
+    const dbPaths = [
+      path.join(process.cwd(), 'prototype', 'news_db.json'),
+      path.join(__dirname, '..', 'prototype', 'news_db.json')
+    ];
+    for (const dbPath of dbPaths) {
+      if (fs.existsSync(dbPath)) {
+        try {
+          const list = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+          const found = list.find(item => String(item.id) === String(id));
+          if (found) {
+            article = found;
+            break;
+          }
+        } catch (_) {}
+      }
     }
   }
 

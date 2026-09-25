@@ -233,6 +233,168 @@ class _AdminPublishPageState extends ConsumerState<AdminPublishPage> {
       ref.invalidate(latestNewsProvider);
       ref.invalidate(breakingNewsProvider);
 
+      // Instant green notification banner
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle_rounded, color: Colors.white, size: 24),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'ಸುದ್ದಿ ಯಶಸ್ವಿಯಾಗಿ ಪ್ರಕಟಿಸಲಾಗಿದೆ! (Post ID: $newId)',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: const Color(0xFF16A34A),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+
+      final fullWhatsAppMsg = '▶️ $newTitle\n\n$shareUrl\n\n➡️ ವಾರ್ತಾ ವರದಿಗಾಗಿ ಸಂಪರ್ಕಿಸಿ : 8792462142\n\n🥏 ಸಂಪಾತಿ ನ್ಯೂಸ್ ವಾಟ್ಸಪ್ ಗ್ರೂಪ್ ಲಿಂಕ್\nhttps://chat.whatsapp.com/GOB3eLICQWc9T9j4hqX4IL\n\n🟢 ವಾಟ್ಸಪ್ ಚಾನೆಲ್ ಲಿಂಕ್\nhttps://whatsapp.com/channel/0029Vb40h6N90x34iudUFp3j';
+
+      // Show prominent modal dialog
+      await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogCtx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+          actionsPadding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.check_circle_rounded, color: Color(0xFF16A34A), size: 32),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'ಸುದ್ದಿ ಯಶಸ್ವಿಯಾಗಿ ಪ್ರಕಟಿಸಲಾಗಿದೆ!',
+                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.black87),
+                    ),
+                    Text(
+                      'News Published Successfully',
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          content: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  newTitle,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black87),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'ಹಂಚಿಕೊಳ್ಳಲು ಲೈವ್ ಲಿಂಕ್ (Public URL):',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black54),
+                      ),
+                      const SizedBox(height: 4),
+                      SelectableText(
+                        shareUrl,
+                        style: const TextStyle(fontSize: 13, color: Colors.blue, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    html.window.open(
+                      'https://api.whatsapp.com/send?text=${Uri.encodeComponent(fullWhatsAppMsg)}',
+                      '_blank',
+                    );
+                  },
+                  icon: const Icon(Icons.chat_bubble_rounded, color: Colors.white, size: 20),
+                  label: const Text('💬 WhatsApp ಹಂಚಿಕೊಳ್ಳಿ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF25D366),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          html.window.navigator.clipboard?.writeText(shareUrl);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('ಲಿಂಕ್ ಕಾಪಿ ಮಾಡಲಾಗಿದೆ! (Link copied!)')),
+                          );
+                        },
+                        icon: const Icon(Icons.copy_rounded, size: 16),
+                        label: const Text('ಲಿಂಕ್ ಕಾಪಿ'),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          html.window.navigator.clipboard?.writeText(fullWhatsAppMsg);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('ಸಂಪೂರ್ಣ ವಾಟ್ಸಪ್ ಸಂದೇಶ ಕಾಪಿ ಮಾಡಲಾಗಿದೆ!')),
+                          );
+                        },
+                        icon: const Icon(Icons.assignment_outlined, size: 16),
+                        label: const Text('ಪೂರ್ಣ ಸಂದೇಶ'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton.icon(
+              onPressed: () {
+                Navigator.of(dialogCtx).pop();
+                context.go('/article/$newId');
+              },
+              icon: const Icon(Icons.visibility_outlined, size: 18),
+              label: const Text('ಸುದ್ದಿ ವೀಕ್ಷಿಸಿ (View News)'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(dialogCtx).pop(),
+              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryColor),
+              child: const Text('ಸರಿ / ಹೊಸ ಸುದ್ದಿ (Done)', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      );
+
       _formKey.currentState!.reset();
       _titleController.clear();
       _subtitleController.clear();
@@ -302,6 +464,81 @@ class _AdminPublishPageState extends ConsumerState<AdminPublishPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      if (_publishedArticleId != null && _publishedArticleUrl != null) ...[
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          margin: const EdgeInsets.only(bottom: 20),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF0FDF4),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: const Color(0xFF86EFAC), width: 1.5),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.check_circle_rounded, color: Color(0xFF16A34A), size: 24),
+                                  const SizedBox(width: 8),
+                                  const Expanded(
+                                    child: Text(
+                                      'ಸುದ್ದಿ ಯಶಸ್ವಿಯಾಗಿ ಪ್ರಕಟಿಸಲಾಗಿದೆ! (Successfully Published)',
+                                      style: TextStyle(
+                                        color: Color(0xFF166534),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.close, size: 18, color: Colors.grey),
+                                    onPressed: () => setState(() => _publishedArticleId = null),
+                                    tooltip: 'Dismiss',
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                _publishedArticleTitle ?? '',
+                                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                              ),
+                              const SizedBox(height: 10),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: [
+                                  ElevatedButton.icon(
+                                    onPressed: () {
+                                      final title = _publishedArticleTitle ?? '';
+                                      final url = _publishedArticleUrl ?? '';
+                                      final msg = '▶️ $title\n\n$url\n\n➡️ ವಾರ್ತಾ ವರದಿಗಾಗಿ ಸಂಪರ್ಕಿಸಿ : 8792462142\n\n🥏 ಸಂಪಾತಿ ನ್ಯೂಸ್ ವಾಟ್ಸಪ್ ಗ್ರೂಪ್ ಲಿಂಕ್\nhttps://chat.whatsapp.com/GOB3eLICQWc9T9j4hqX4IL\n\n🟢 ವಾಟ್ಸಪ್ ಚಾನೆಲ್ ಲಿಂಕ್\nhttps://whatsapp.com/channel/0029Vb40h6N90x34iudUFp3j';
+                                      html.window.open('https://api.whatsapp.com/send?text=${Uri.encodeComponent(msg)}', '_blank');
+                                    },
+                                    icon: const Icon(Icons.chat_bubble_rounded, color: Colors.white, size: 16),
+                                    label: const Text('WhatsApp ಹಂಚಿಕೊಳ್ಳಿ', style: TextStyle(color: Colors.white, fontSize: 12)),
+                                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF25D366)),
+                                  ),
+                                  OutlinedButton.icon(
+                                    onPressed: () {
+                                      html.window.navigator.clipboard?.writeText(_publishedArticleUrl!);
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('ಲಿಂಕ್ ಕಾಪಿ ಮಾಡಲಾಗಿದೆ!')),
+                                      );
+                                    },
+                                    icon: const Icon(Icons.copy_rounded, size: 16),
+                                    label: const Text('ಲಿಂಕ್ ಕಾಪಿ', style: TextStyle(fontSize: 12)),
+                                  ),
+                                  OutlinedButton.icon(
+                                    onPressed: () => context.go('/article/$_publishedArticleId'),
+                                    icon: const Icon(Icons.visibility_outlined, size: 16),
+                                    label: const Text('ವೀಕ್ಷಿಸಿ (View)', style: TextStyle(fontSize: 12)),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                       TextFormField(
                         controller: _titleController,
                         decoration: const InputDecoration(labelText: 'Title *', border: OutlineInputBorder()),

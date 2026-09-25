@@ -191,7 +191,7 @@ class BreakingNewsTicker extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final breakingNewsAsync = ref.watch(breakingNewsProvider);
+    final latestNewsAsync = ref.watch(latestNewsProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
@@ -210,7 +210,7 @@ class BreakingNewsTicker extends ConsumerWidget {
             ),
           ).animate().fade(duration: 300.ms).slideX(begin: -0.2),
           Expanded(
-            child: breakingNewsAsync.when(
+            child: latestNewsAsync.when(
               loading: () => const Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))),
               error: (err, stack) => const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),
@@ -218,7 +218,7 @@ class BreakingNewsTicker extends ConsumerWidget {
               ),
               data: (articles) {
                 if (articles.isEmpty) return const SizedBox();
-                final text = articles.map((a) => a.title).join('  |  ');
+                final text = articles.take(10).map((a) => a.title).join('  |  ');
                 return SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   physics: const NeverScrollableScrollPhysics(),
