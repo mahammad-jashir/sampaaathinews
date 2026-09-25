@@ -22,7 +22,6 @@ class _AdminPublishPageState extends ConsumerState<AdminPublishPage> {
   final _excerptController = TextEditingController();
   final _contentController = TextEditingController();
   final _imageUrlController = TextEditingController();
-  final _readingTimeController = TextEditingController(text: '3');
 
   int? _selectedCategoryId;
   int? _selectedDistrictId;
@@ -46,7 +45,6 @@ class _AdminPublishPageState extends ConsumerState<AdminPublishPage> {
     _excerptController.dispose();
     _contentController.dispose();
     _imageUrlController.dispose();
-    _readingTimeController.dispose();
     super.dispose();
   }
 
@@ -204,16 +202,20 @@ class _AdminPublishPageState extends ConsumerState<AdminPublishPage> {
         featuredImageUrl = _imageUrlController.text.trim();
       }
 
+      final contentText = _contentController.text.trim();
+      final words = contentText.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).length;
+      final autoReadingTime = (words / 150).ceil().clamp(1, 15);
+
       final apiClient = ref.read(apiClientProvider);
       final response = await apiClient.dio.post('/sampathi/v1/news/add', data: {
         'title': _titleController.text.trim(),
         'subtitle': _subtitleController.text.trim(),
         'excerpt': _excerptController.text.trim(),
-        'content': '<p>${_contentController.text.trim()}</p>',
+        'content': '<p>$contentText</p>',
         'featured_image_url': featuredImageUrl,
         'category_id': _selectedCategoryId,
         'district_id': _selectedDistrictId,
-        'reading_time': int.tryParse(_readingTimeController.text) ?? 3,
+        'reading_time': autoReadingTime,
       });
 
       if (!mounted) return;
@@ -401,7 +403,6 @@ class _AdminPublishPageState extends ConsumerState<AdminPublishPage> {
       _excerptController.clear();
       _contentController.clear();
       _imageUrlController.clear();
-      _readingTimeController.text = '3';
       setState(() {
         _selectedCategoryId = null;
         _selectedDistrictId = null;
@@ -671,12 +672,6 @@ class _AdminPublishPageState extends ConsumerState<AdminPublishPage> {
                             ),
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _readingTimeController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(labelText: 'Reading time (minutes)', border: OutlineInputBorder()),
                       ),
                       if (_publishedArticleId != null && _publishedArticleUrl != null) ...[
                         Container(
